@@ -1,14 +1,13 @@
 # Store Manager API
-[![Coverage Status](https://coveralls.io/repos/github/johnwayodi/sm-api/badge.svg?branch=ft-product-endpoints-161360000)](https://coveralls.io/github/johnwayodi/sm-api?branch=ft-product-endpoints-161360000)
-[![Build Status](https://travis-ci.org/johnwayodi/sm-api.svg?branch=develop)](https://travis-ci.org/johnwayodi/sm-api)
-[![Maintainability](https://api.codeclimate.com/v1/badges/4d79798175e2ed113d98/maintainability)](https://codeclimate.com/github/johnwayodi/sm-api/maintainability)
+[![Coverage Status](https://coveralls.io/repos/github/johnwayodi/sm-api-v2/badge.svg?branch=develop)](https://coveralls.io/github/johnwayodi/sm-api-v2?branch=develop)
+[![Build Status](https://travis-ci.org/johnwayodi/sm-api-v2.svg?branch=develop)](https://travis-ci.org/johnwayodi/sm-api-v2)
+[![Maintainability](https://api.codeclimate.com/v1/badges/c23849e92db44dd7a9b2/maintainability)](https://codeclimate.com/github/johnwayodi/sm-api-v2/maintainability)
 
 API for Store Manager Application
 
 ## Testing
 Test the api can be done using a variety of api testing tools, however [Postman](https://www.getpostman.com/) is suggested.
 
-The api is hosted on heroku and can be found [here](https://jw-store-manager-api.herokuapp.com/apidocs)
 
 #### Endpoints
 The api exposes the following endpoints:
