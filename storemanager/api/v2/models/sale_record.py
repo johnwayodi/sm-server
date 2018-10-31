@@ -3,8 +3,6 @@ import psycopg2
 from storemanager.api.v2.database.config import config
 from .abstract_model import AbstractModel
 
-SALES = []
-
 
 class SaleRecordModel(AbstractModel):
     """Model class for Sale Record."""
