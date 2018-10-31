@@ -5,7 +5,7 @@ Contains tests for both Admin User and Attendant.
 import json
 import pytest
 from run import app
-from tests.v2.sample_data import PRODUCTS, SALE_RECORDS, USERS, HEADERS
+from tests.v2.sample_data import *
 
 
 @pytest.fixture
@@ -78,6 +78,99 @@ def authorize_attendant(client):
     return header_attendant
 
 
+def test_admin_add_category(client, authorize_admin):
+    """admin should be able to add category"""
+    headers = authorize_admin
+    expected_result = {
+        "id": 1,
+        "name": "Furniture",
+        "description": "this is the furniture category"
+    }
+
+    response = client.post('/api/v2/categories',
+                           data=json.dumps(CATEGORIES['category1']), headers=headers)
+    data = response.json
+    assert response.status_code == 201
+    assert data['category'] == expected_result
+
+
+def test_admin_get_category(client, authorize_admin):
+    """admin should be able to get a category"""
+    headers = authorize_admin
+    expected_result = {
+        "id": 1,
+        "name": "Furniture",
+        "description": "this is the furniture category"
+    }
+
+    response = client.get('/api/v2/categories/{:d}'.format(1), headers=headers)
+    data = response.json
+    assert response.status_code == 200
+    assert data['category'] == expected_result
+
+
+def test_admin_get_categories(client, authorize_admin):
+    """admin should be able to get all categories"""
+    headers = authorize_admin
+    client.post('/api/v2/categories', data=json.dumps(CATEGORIES['category2']), headers=headers)
+    client.post('/api/v2/categories', data=json.dumps(CATEGORIES['category3']), headers=headers)
+    client.post('/api/v2/categories', data=json.dumps(CATEGORIES['category4']), headers=headers)
+
+    response = client.get('/api/v2/categories', headers=headers)
+    data = response.json
+
+    assert response.status_code == 200
+    assert len(data['categories']) == 4
+
+
+def test_admin_update_category(client, authorize_admin):
+    """admin should be able to get a category"""
+    headers = authorize_admin
+    expected_message = 'category updated successfully'
+    # expected_result = {
+    #     "id": 2,
+    #     "name": "Electronics",
+    #     "description": "this is the updated electronics category"
+    # }
+
+    response = client.put('/api/v2/categories/2', data=json.dumps(UPDATED_CATEGORY),
+                          headers=headers)
+    data = response.json
+    assert response.status_code == 200
+    assert data['message'] == expected_message
+
+
+def test_admin_delete_category(client, authorize_admin):
+    """admin should be able to get all categories"""
+    headers = authorize_admin
+    # expected_result = {
+    #     'id': 1,
+    #     'name': 'Table',
+    #     'price': 10000,
+    #     'description': 'a cool table',
+    #     'category': 'furniture',
+    #     'stock': 100,
+    #     'min_stock': 10
+    # }
+
+    response = client.delete('/api/v2/categories/{:d}'.format(3), headers=headers)
+
+    # data = response.json
+    assert response.status_code == 200
+    # assert data['category'] == expected_result
+
+
+def test_admin_get_products_empty(client, authorize_admin):
+    """admin should be able to get no products, as list is empty"""
+    headers = authorize_admin
+    expected_message = 'no products added yet'
+    response = client.get('/api/v2/products', headers=headers)
+
+    data = response.json
+    assert response.status_code == 404
+    assert data['message'] == expected_message
+
+
 def test_admin_add_product(client, authorize_admin):
     """admin should be able to add product"""
     headers = authorize_admin
@@ -86,7 +179,7 @@ def test_admin_add_product(client, authorize_admin):
         'name': 'Table',
         'price': 10000,
         'description': 'a cool table',
-        'category': 'furniture',
+        'category': 'Furniture',
         'stock': 100,
         'min_stock': 10
     }
@@ -121,7 +214,7 @@ def test_admin_get_one_product(client, authorize_admin):
         'name': 'Television',
         'price': 30000,
         'description': 'a cool television',
-        'category': 'electronic',
+        'category': 'Electronics',
         'stock': 200,
         'min_stock': 20
     }
@@ -129,18 +222,21 @@ def test_admin_get_one_product(client, authorize_admin):
     response = client.get('/api/v2/products/{:d}'.format(3), headers=headers)
     data = response.json
 
-    assert data['product'] == expected_result
     assert response.status_code == 200
+    assert data['product'] == expected_result
 
 
 def test_admin_remove_product(client, authorize_admin):
     """admin should be able to delete a product"""
     headers = authorize_admin
     client.post('/api/v2/products', data=json.dumps(PRODUCTS['product5']), headers=headers)
+    expected_message = 'product deleted successfully'
 
     response = client.delete('/api/v2/products/{:d}'.format(5), headers=headers)
+    data = response.json
 
     assert response.status_code == 200
+    assert data['message'] == expected_message
 
 
 def test_admin_add_sale(client, authorize_admin):
@@ -158,7 +254,7 @@ def test_admin_add_sale(client, authorize_admin):
 def test_admin_get_sales_empty(client, authorize_admin):
     """admin should be able to get all sales, this tests for empty response"""
     headers = authorize_admin
-    expected_message = 'no sale records created yet'
+    expected_message = 'no sales added yet'
 
     response = client.get('/api/v2/sales', headers=headers)
     data = response.json
@@ -212,7 +308,7 @@ def test_attendant_get_one_product(client, authorize_attendant):
         'name': 'Television',
         'description': 'a cool television',
         'price': 30000,
-        'category': 'electronic',
+        'category': 'Electronics',
         'stock': 200,
         'min_stock': 20
     }
@@ -220,8 +316,8 @@ def test_attendant_get_one_product(client, authorize_attendant):
     response = client.get('/api/v2/products/{:d}'.format(3), headers=headers)
     data = response.json
 
-    assert data['product'] == expected_result
     assert response.status_code == 200
+    assert data['product'] == expected_result
 
 
 def test_attendant_remove_product(client, authorize_attendant):
@@ -293,7 +389,7 @@ def test_attendant_get_single_sale(client, authorize_attendant):
     data = response.json
 
     assert response.status_code == 200
-    assert data['sale'] == expected_result
+    assert data == expected_result
 
 
 def test_admin_get_all_sales(client, authorize_admin):
@@ -341,4 +437,4 @@ def test_admin_get_single_sale(client, authorize_admin):
     data = response.json
 
     assert response.status_code == 200
-    assert data['sale'] == expected_result
+    assert data == expected_result

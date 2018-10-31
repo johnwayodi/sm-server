@@ -274,11 +274,11 @@ class ProductList(Resource):
             product = ProductModel.get_by_name(get_product_by_name, (product_name,))
             if product is not None:
                 return {'message': 'product already exists, consider updating attributes'}, 400
-            # category_result = CategoryModel.get_by_name(get_category_by_name, (product_category,))
-            # if category_result is None:
-            #     return {'message': 'category provided does not exist'}, 400
-            #
-            # category_id = category_result[0]
+            category_result = CategoryModel.get_by_name(get_category_by_name, (product_category,))
+            if category_result is None:
+                return {'message': 'category provided does not exist'}, 400
+
+            category_id = category_result[0]
 
             product_values = (product_name, product_price, product_stock,
                               product_min_stock, product_description, category_id)
@@ -347,7 +347,7 @@ class SaleRecord(Resource):
                     'name': sale_products[i][0],
                     'price': sale_products[i][1],
                     'quantity': sale_products[i][2],
-                    'total': sale_products[i][3]}
+                    'cost': sale_products[i][3]}
                 products[i + 1] = product
 
             return {'id': sale.id,
