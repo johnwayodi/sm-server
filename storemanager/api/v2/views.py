@@ -53,7 +53,10 @@ class Product(Resource):
             product.stock = result[3]
             product.min_stock = result[4]
             product.description = result[5]
-            product.category = result[6]
+
+            category_details = CategoryModel.get_by_id(get_category, (result[6],))
+            category_name = category_details[1]
+            product.category = category_name
 
             return {'product': product.as_dict()}, 200
         else:
@@ -168,7 +171,11 @@ class ProductList(Resource):
             product.stock = result[i][3]
             product.min_stock = result[i][4]
             product.description = result[i][5]
-            product.category = result[i][6]
+
+            category_details = CategoryModel.get_by_id(get_category, (result[i][6],))
+            category_name = category_details[1]
+
+            product.category = category_name
             products[i + 1] = product.as_dict()
         if products == {}:
             return {'message': 'no products added yet'}, 404
@@ -267,11 +274,11 @@ class ProductList(Resource):
             product = ProductModel.get_by_name(get_product_by_name, (product_name,))
             if product is not None:
                 return {'message': 'product already exists, consider updating attributes'}, 400
-            category_result = CategoryModel.get_by_name(get_category_by_name, (product_category,))
-            if category_result is None:
-                return {'message': 'category provided does not exist'}, 400
-
-            category_id = category_result[0]
+            # category_result = CategoryModel.get_by_name(get_category_by_name, (product_category,))
+            # if category_result is None:
+            #     return {'message': 'category provided does not exist'}, 400
+            #
+            # category_id = category_result[0]
 
             product_values = (product_name, product_price, product_stock,
                               product_min_stock, product_description, category_id)
@@ -284,7 +291,10 @@ class ProductList(Resource):
             product.price = result[3]
             product.stock = result[4]
             product.min_stock = result[5]
-            product.category = result[6]
+
+            category_details = CategoryModel.get_by_id(get_category, (result[6],))
+            category_name = category_details[1]
+            product.category = category_name
 
             return {'message': 'product created',
                     'product': product.as_dict()}, 201
@@ -811,7 +821,6 @@ class Categories(Resource):
     def post(self):
         current_user = get_jwt_identity()
         user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
-        # return {'message': current_user}
         if user_details[3] == "admin":
             data = request.get_json()
             name = data.get('name')
