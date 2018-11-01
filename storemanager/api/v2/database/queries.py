@@ -1,4 +1,50 @@
 """The Query module contains all the necessary queries that are used in the application"""
+
+create_table_users = """
+CREATE TABLE USERS (
+ID SERIAL PRIMARY KEY,
+NAME VARCHAR(50) NOT NULL,
+ROLE VARCHAR(10) NOT NULL,
+PASSWORD VARCHAR(60) NOT NULL
+);"""
+
+create_table_categories = """
+CREATE TABLE CATEGORIES (
+ID SERIAL PRIMARY KEY,
+NAME VARCHAR(50) NOT NULL,
+DESCRIPTION TEXT
+);"""
+
+create_table_products = """
+CREATE TABLE PRODUCTS (
+ID SERIAL PRIMARY KEY,
+NAME VARCHAR(50) NOT NULL,
+PRICE INTEGER NOT NULL,
+STOCK INTEGER NOT NULL,
+STOCKMIN INTEGER NOT NULL,
+DESCRIPTION TEXT NOT NULL,
+CATEGORY INTEGER REFERENCES CATEGORIES (ID)
+);"""
+
+create_table_sales = """
+CREATE TABLE SALE_RECORDS (
+ID SERIAL PRIMARY KEY,
+ITEMS INTEGER NOT NULL,
+TOTAL INTEGER NOT NULL
+);"""
+
+create_table_sale_items = """
+CREATE TABLE SALE_RECORD_ITEMS (
+ID SERIAL PRIMARY KEY,
+PRODUCT_NAME TEXT NOT NULL,
+PRICE INTEGER NOT NULL,
+QUANTITY INTEGER NOT NULL,
+TOTAL INTEGER NOT NULL,
+SALE_ID INTEGER REFERENCES SALE_RECORDS (ID)
+);"""
+
+drop_all_tables = """DROP TABLE IF EXISTS USERS, PRODUCTS, CATEGORIES, SALE_RECORDS, SALE_RECORD_ITEMS;"""
+
 create_category = "INSERT INTO categories(name, description) VALUES(%s, %s) RETURNING id, name, description;"
 
 get_category = "SELECT id, name, description FROM categories WHERE id = %s"
@@ -16,8 +62,8 @@ INSERT INTO products(name, price, stock, stockmin, description, category)
 VALUES(%s, %s, %s,%s, %s, %s) 
 RETURNING id, name, description, price, stock, stockmin, category;"""
 
-get_product = "SELECT id, name, description, price, stock, stockmin, category FROM products WHERE id = %s"
-get_product_by_name = "SELECT name FROM products WHERE name = %s"
+get_product = "SELECT * FROM products WHERE id = %s"
+get_product_by_name = "SELECT id, name, price, stock, stockmin FROM products WHERE name = %s"
 delete_product = "DELETE FROM products WHERE id = %s"
 
 update_product = """

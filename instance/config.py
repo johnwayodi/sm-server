@@ -1,26 +1,43 @@
 """Configuration Modes for the Application"""
+import os
 
 
-class Config(object):
+class Config:
     """Default Configuration"""
-    pass
+    DEBUG = False
+    TESTING = False
+    CSRF_ENABLED = True
+    SECRET_KEY = os.environ.get('API_SECRET_KEY')
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
+    DATABASE_HOST = os.environ.get('DATABASE_HOST')
+    DATABASE_NAME = os.environ.get('DATABASE_NAME')
+    DATABASE_USER = os.environ.get('DATABASE_USER')
+    DATABASE_PASSWORD = os.environ.get('DATABASE_PASS')
+    DATABASE_URL = 'http://127.0.0.1:34277/?key=4443f9b5-2ca2-45bc-8667-ea5187d1e5c5'
 
 
-class Develop(Config):
+class Development(Config):
     """Development Configuration"""
+    DEBUG = True
 
-    def __init__(self):
-        self.debug = True
+
+class Testing(Config):
+    """Testing Configuration"""
+    DEBUG = True
+    TESTING = True
+
+
+class StagingConfig(Config):
+    DEVELOPMENT = True
+    DEBUG = True
 
 
 class Production(Config):
     """Production Configuration"""
-
-    def __init__(self):
-        self.debug = False
+    DEBUG = False
 
 
 APP_CONFIG = {
-    "development": Develop,
+    "development": Development,
     "production": Production
 }

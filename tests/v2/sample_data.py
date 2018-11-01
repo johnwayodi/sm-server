@@ -9,7 +9,7 @@ PRODUCTS = {
         'name': 'Table',
         'price': 10000,
         'description': 'a cool table',
-        'category': 'furniture',
+        'category': 'Furniture',
         'stock': 100,
         'min_stock': 10
     },
@@ -17,7 +17,7 @@ PRODUCTS = {
         'name': 'Phone',
         'price': 20000,
         'description': 'a cool phone',
-        'category': 'smart phone',
+        'category': 'Electronics',
         'stock': 1000,
         'min_stock': 50
     },
@@ -25,7 +25,7 @@ PRODUCTS = {
         'name': 'Television',
         'price': 30000,
         'description': 'a cool television',
-        'category': 'electronic',
+        'category': 'Electronics',
         'stock': 200,
         'min_stock': 20
     },
@@ -33,29 +33,53 @@ PRODUCTS = {
         'name': 'Couch',
         'price': 50000,
         'description': 'a cool couch',
-        'category': 'furniture',
+        'category': 'Furniture',
         'stock': 100,
         'min_stock': 10
     },
     "product5": {
-        'name': 'Android',
-        'price': 5000,
-        'description': 'a cool phone',
-        'category': 'Phone',
+        'name': 'Bed',
+        'price': 50000,
+        'description': 'a cool bed',
+        'category': 'Furniture',
         'stock': 100,
         'min_stock': 10
     }
+}
+
+CATEGORIES = {
+    "category1": {
+        "name": "Furniture",
+        "description": "this is the furniture category"
+    },
+    "category2": {
+        "name": "Electronics",
+        "description": "this is the electronics category"
+    },
+    "category3": {
+        "name": "Food",
+        "description": "this is the Food category"
+    },
+    "category4": {
+        "name": "Accessories",
+        "description": "this is the Accessories category"
+    }
+}
+
+UPDATED_CATEGORY = {
+    "name": "Electronics",
+    "description": "this is the updated electronics category"
 }
 
 SALE_RECORDS = {
     "sale1": {
         "products": {
             "1": {
-                "product_id": 1,
+                "name": "Table",
                 "count": 2
             },
             "2": {
-                "product_id": 3,
+                "name": "Television",
                 "count": 10
             }
         }
@@ -63,15 +87,15 @@ SALE_RECORDS = {
     "sale2": {
         "products": {
             "1": {
-                "product_id": 1,
+                "name": "Table",
                 "count": 2
             },
             "2": {
-                "product_id": 2,
+                'name': 'Phone',
                 "count": 2
             },
             "3": {
-                "product_id": 4,
+                'name': 'Couch',
                 "count": 10
             }
         }

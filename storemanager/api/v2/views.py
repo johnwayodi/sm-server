@@ -49,11 +49,15 @@ class Product(Resource):
             product = ProductModel()
             product.id = result[0]
             product.name = result[1]
-            product.description = result[2]
-            product.price = result[3]
-            product.stock = result[4]
-            product.min_stock = result[5]
-            product.category = result[6]
+            product.price = result[2]
+            product.stock = result[3]
+            product.min_stock = result[4]
+            product.description = result[5]
+
+            category_details = CategoryModel.get_by_id(get_category, (result[6],))
+            category_name = category_details[1]
+            product.category = category_name
+
             return {'product': product.as_dict()}, 200
         else:
             return {'message': 'product id must be integer'}, 400
@@ -83,45 +87,55 @@ class Product(Resource):
          404:
            description: Product with specified id does not exist.
             """
-        if product_id.isdigit():
-            data = request.get_json()
-            name = data['name']
-            description = data['description']
-            price = data['price']
-            stock = data['stock']
-            min_stock = data['min_stock']
-            category = data['category']
+        current_user = get_jwt_identity()
+        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        if user_details[3] == "admin":
+            if product_id.isdigit():
+                data = request.get_json()
+                name = data['name']
+                description = data['description']
+                price = data['price']
+                stock = data['stock']
+                min_stock = data['min_stock']
+                category = data['category']
 
-            category_details = CategoryModel.get_by_name(get_category_by_name, (category,))
-            if category_details is None:
-                return {'message': 'category provided does not exist'}, 404
-            category_id = category_details[0]
+                category_details = CategoryModel.get_by_name(get_category_by_name, (category,))
+                if category_details is None:
+                    return {'message': 'category provided does not exist'}, 404
+                category_id = category_details[0]
 
-            result = ProductModel.get_by_id(get_product, (product_id,))
-            if result is None:
-                return {'message': 'product with id does not exist'}, 404
+                result = ProductModel.get_by_id(get_product, (product_id,))
+                if result is None:
+                    return {'message': 'product with id does not exist'}, 404
 
-            product = ProductModel()
-            product.id = result[0]
-            values = (name, description, price, stock, min_stock, category_id, product.id)
-            product.update(update_product, values)
-            return {'message': 'product updated successfully'}, 200
+                product = ProductModel()
+                product.id = result[0]
+                values = (name, description, price, stock, min_stock, category_id, product.id)
+                product.update(update_product, values)
+                return {'message': 'product updated successfully'}, 200
 
-        return {'message': 'provided id is not an integer'}, 400
+            return {'message': 'provided id is not an integer'}, 400
+
+        return {'message': 'only administrator can delete a product'}, 403
 
     @jwt_required
     def delete(self, product_id):
-        if product_id.isdigit():
-            result = ProductModel.get_by_id(get_product, (product_id,))
-            if result is None:
-                return {'message': 'product with id does not exist'}, 404
+        current_user = get_jwt_identity()
+        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        if user_details[3] == "admin":
+            if product_id.isdigit():
+                result = ProductModel.get_by_id(get_product, (product_id,))
+                if result is None:
+                    return {'message': 'product with id does not exist'}, 404
 
-            product = ProductModel()
-            product.id = result[0]
-            product.delete(delete_product, (product_id,))
-            return {'message': 'product deleted successfully'}, 200
+                product = ProductModel()
+                product.id = result[0]
+                product.delete(delete_product, (product_id,))
+                return {'message': 'product deleted successfully'}, 200
 
-        return {'message': 'provided id is not an integer'}, 400
+            return {'message': 'provided id is not an integer'}, 400
+
+        return {'message': 'only administrator can delete a product'}, 403
 
 
 class ProductList(Resource):
@@ -149,16 +163,19 @@ class ProductList(Resource):
             """
         products = {}
         result = ProductModel.get_all(get_all_products)
-
         for i in range(len(result)):
             product = ProductModel()
             product.id = result[i][0]
             product.name = result[i][1]
-            product.description = result[i][2]
-            product.price = result[i][3]
-            product.stock = result[i][4]
-            product.min_stock = result[i][5]
-            product.category = result[i][6]
+            product.price = result[i][2]
+            product.stock = result[i][3]
+            product.min_stock = result[i][4]
+            product.description = result[i][5]
+
+            category_details = CategoryModel.get_by_id(get_category, (result[i][6],))
+            category_name = category_details[1]
+
+            product.category = category_name
             products[i + 1] = product.as_dict()
         if products == {}:
             return {'message': 'no products added yet'}, 404
@@ -274,7 +291,10 @@ class ProductList(Resource):
             product.price = result[3]
             product.stock = result[4]
             product.min_stock = result[5]
-            product.category = result[6]
+
+            category_details = CategoryModel.get_by_id(get_category, (result[6],))
+            category_name = category_details[1]
+            product.category = category_name
 
             return {'message': 'product created',
                     'product': product.as_dict()}, 201
@@ -327,7 +347,7 @@ class SaleRecord(Resource):
                     'name': sale_products[i][0],
                     'price': sale_products[i][1],
                     'quantity': sale_products[i][2],
-                    'total': sale_products[i][3]}
+                    'cost': sale_products[i][3]}
                 products[i + 1] = product
 
             return {'id': sale.id,
@@ -427,23 +447,21 @@ class SaleRecords(Resource):
 
             for i in range(len(items)):
                 cart_id = str(i + 1)
-                product_id = items[cart_id]['product_id']
-                product = ProductModel.get_by_id(get_product, (product_id,))
+                product_name = items[cart_id]['name']
+                product = ProductModel.get_by_name(get_product_by_name, (product_name,))
                 # return {'result': product}
                 if product is None:
-                    return {'message': 'cannot create sale record',
-                            'reason': 'product with id {} does not exist'.format(i + 1)}, 400
+                    return {'message': 'failed to create sale record',
+                            'reason': 'product named {} does not exist'.format(product_name)}, 400
 
                 quantity_in_cart = items[cart_id].get('count')
-                product_name = product[1]
-                product_price = product[3]
+                product_price = product[2]
                 cost = product_price * quantity_in_cart
-                if product[4] - quantity_in_cart < product[5]:
-                    p_name = product_name
-                    return {'message': 'cannot create sale record',
-                            'reason': 'cannot sell past minimum stock for {}'.format(p_name)}, 400
+                if product[3] - quantity_in_cart < product[4]:
+                    return {'message': 'failed to create sale record',
+                            'reason': 'cannot sell past minimum stock for {}'.format(product_name)}, 400
 
-                new_stock_value = product[4] - quantity_in_cart
+                new_stock_value = product[3] - quantity_in_cart
                 ProductModel.update_on_sale(update_product_after_sale, (new_stock_value, product[0]))
 
                 product_info = (product_name, product_price, quantity_in_cart, cost)
@@ -461,11 +479,10 @@ class SaleRecords(Resource):
 
             products_in_sale = []
             for i in range(len(products)):
-                product = list(products[i])
-                product.append(sale.id)
-                tuple(product)
-                products_in_sale.append(product)
-
+                product = products[i]
+                sale_item = product + (sale.id,)
+                # tuple(product)
+                products_in_sale.append(sale_item)
             sale_items = SaleRecordModelItem()
             sale_items.save(create_sale_item, products_in_sale)
             return {'message': 'Sale Record created successfully',
@@ -477,6 +494,7 @@ class SaleRecords(Resource):
 class User(Resource):
     """Allows requests on single user"""
 
+    @jwt_required
     def get(self, u_id):
         """
        Retrieve a User
@@ -549,6 +567,7 @@ class User(Resource):
 class UserList(Resource):
     """Allow requests on users"""
 
+    @jwt_required
     def get(self):
         """
        Retrieve All Users
@@ -557,19 +576,24 @@ class UserList(Resource):
          200:
            description: List of Users Returned Successful
             """
-        users = {}
-        result = UserModel.get_all(get_all_users)
+        current_user = get_jwt_identity()
+        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        if user_details[3] == "admin":
+            users = {}
+            result = UserModel.get_all(get_all_users)
 
-        for i in range(len(result)):
-            user = UserModel()
-            user.id = result[i][0]
-            user.username = result[i][1]
-            user.role = result[i][2]
-            users[i + 1] = user.as_dict()
-        if users == {}:
-            return {'message': 'no users in system yet'}, 404
+            for i in range(len(result)):
+                user = UserModel()
+                user.id = result[i][0]
+                user.username = result[i][1]
+                user.role = result[i][2]
+                users[i + 1] = user.as_dict()
+            if users == {}:
+                return {'message': 'no users in system yet'}, 404
 
-        return {'users': users}, 200
+            return {'users': users}, 200
+
+        return {'message': 'only admin can view users of the system'}
 
 
 class UserRegistration(Resource):
@@ -710,83 +734,108 @@ class UserLogin(Resource):
 class Category(Resource):
     """Allows crud on single category object"""
 
+    @jwt_required
     def get(self, category_id):
-        if category_id.isdigit():
-            result = CategoryModel.get_by_id(get_category, (category_id,))
-            if result is None:
-                return {'message': 'category with id does not exist'}, 404
-            else:
+        current_user = get_jwt_identity()
+        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        if user_details[3] == "admin":
+            if category_id.isdigit():
+                result = CategoryModel.get_by_id(get_category, (category_id,))
+                if result is None:
+                    return {'message': 'category with id does not exist'}, 404
+                else:
+                    category = CategoryModel()
+                    category.id = result[0]
+                    category.name = result[1]
+                    category.description = result[2]
+                return {'message': 'category details',
+                        'category': category.as_dict()}, 200
+
+            return {'message': 'provided id is not an integer'}, 400
+        return {'message': 'only an admin can view categories'}
+
+    @jwt_required
+    def put(self, category_id):
+        current_user = get_jwt_identity()
+        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        if user_details[3] == "admin":
+            if category_id.isdigit():
+                data = request.get_json()
+                name = data.get('name')
+                description = data.get('description')
+                result = CategoryModel.get_by_id(get_category, (category_id,))
+                if result is None:
+                    return {'message': 'category with id does not exist'}, 404
+
                 category = CategoryModel()
                 category.id = result[0]
-                category.name = result[1]
-                category.description = result[2]
-            return {'message': 'category details',
-                    'category': category.as_dict()}, 200
+                category.update(update_category, (name, description, category.id))
+                return {'message': 'category updated successfully'}, 200
 
-        return {'message': 'provided id is not an integer'}, 400
+            return {'message': 'provided id is not an integer'}, 400
+        return {'message': 'only an admin can update a category'}
 
-    def put(self, category_id):
-        if category_id.isdigit():
-            data = request.get_json()
-            name = data.get('name')
-            description = data.get('description')
-            result = CategoryModel.get_by_id(get_category, (category_id,))
-            if result is None:
-                return {'message': 'category with id does not exist'}, 404
-
-            category = CategoryModel()
-            category.id = result[0]
-            category.update(update_category, (name, description, category.id))
-            return {'message': 'category updated successfully'}, 200
-
-        return {'message': 'provided id is not an integer'}, 400
-
+    @jwt_required
     def delete(self, category_id):
-        if category_id.isdigit():
-            result = CategoryModel.get_by_id(get_category, (category_id,))
-            if result is None:
-                return {'message': 'category with id does not exist'}, 404
+        current_user = get_jwt_identity()
+        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        if user_details[3] == "admin":
+            if category_id.isdigit():
+                result = CategoryModel.get_by_id(get_category, (category_id,))
+                if result is None:
+                    return {'message': 'category with id does not exist'}, 404
 
-            category = CategoryModel()
-            category.id = result[0]
-            category.delete(delete_category, (category_id,))
-            return {'message': 'category deleted successfully'}, 200
+                category = CategoryModel()
+                category.id = result[0]
+                category.delete(delete_category, (category_id,))
+                return {'message': 'category deleted successfully'}, 200
 
-        return {'message': 'provided id is not an integer'}, 400
+            return {'message': 'provided id is not an integer'}, 400
+        return {'message': 'only an admin can delete a product'}
 
 
 class Categories(Resource):
     """Allows crud on categories"""
 
+    @jwt_required
     def get(self):
-        categories = {}
-        result = CategoryModel.get_all(get_all_categories)
+        current_user = get_jwt_identity()
+        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        if user_details[3] == "admin":
+            categories = {}
+            result = CategoryModel.get_all(get_all_categories)
 
-        for i in range(len(result)):
-            category = CategoryModel()
-            category.id = result[i][0]
-            category.name = result[i][1]
-            category.description = result[i][2]
-            categories[i + 1] = category.as_dict()
-        if categories == {}:
-            return {'message': 'no categories added yet'}
-        return {'categories': categories}, 200
+            for i in range(len(result)):
+                category = CategoryModel()
+                category.id = result[i][0]
+                category.name = result[i][1]
+                category.description = result[i][2]
+                categories[i + 1] = category.as_dict()
+            if categories == {}:
+                return {'message': 'no categories added yet'}
+            return {'categories': categories}, 200
+        return {'message': 'only an admin can view categories'}
 
+    @jwt_required
     @expects_json(CATEGORY_SCHEMA)
     def post(self):
-        data = request.get_json()
-        name = data.get('name')
-        description = data.get('description')
-        if name.isdigit():
-            return {'message': 'name cannot be an integer value'}, 400
-        if description.isdigit():
-            return {'message': 'description cannot be an integer value'}, 400
+        current_user = get_jwt_identity()
+        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        if user_details[3] == "admin":
+            data = request.get_json()
+            name = data.get('name')
+            description = data.get('description')
+            if name.isdigit():
+                return {'message': 'name cannot be an integer value'}, 400
+            if description.isdigit():
+                return {'message': 'description cannot be an integer value'}, 400
 
-        category = CategoryModel()
-        result = category.save(create_category, (name, description))
+            category = CategoryModel()
+            result = category.save(create_category, (name, description))
 
-        category.id = result[0]
-        category.name = result[1]
-        category.description = result[2]
-        return {'message': 'category created',
-                'category': category.as_dict()}, 200
+            category.id = result[0]
+            category.name = result[1]
+            category.description = result[2]
+            return {'message': 'category created',
+                    'category': category.as_dict()}, 201
+        return {'message': 'only an admin can add a category'}
