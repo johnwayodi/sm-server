@@ -75,6 +75,7 @@ update_product_after_sale = """
 UPDATE products 
 SET stock = %s
 WHERE id = %s;"""
+
 get_all_products = "SELECT * FROM products ORDER BY id"
 
 create_sale = "INSERT INTO sale_records(items, total) VALUES(%s, %s) RETURNING id, items, total;"

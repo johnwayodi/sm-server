@@ -1,3 +1,4 @@
+import os
 import psycopg2
 from storemanager.api.v2.database.config import config
 from flask import current_app
@@ -8,9 +9,8 @@ from .queries import create_table_users, create_table_products, create_table_cat
 class Database:
 
     def connect(self):
-        database_url = current_app.config.get('DATABASE_URL')
 
-        conn = psycopg2.connect(database_url)
+        conn = psycopg2.connect(os.environ['DATABASE_URL'], sslmode='require')
 
         return conn
 

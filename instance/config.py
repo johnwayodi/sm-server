@@ -13,7 +13,6 @@ class Config:
     DATABASE_NAME = os.environ.get('DATABASE_NAME')
     DATABASE_USER = os.environ.get('DATABASE_USER')
     DATABASE_PASSWORD = os.environ.get('DATABASE_PASS')
-    DATABASE_URL = 'http://127.0.0.1:34277/?key=4443f9b5-2ca2-45bc-8667-ea5187d1e5c5'
 
 
 class Development(Config):
