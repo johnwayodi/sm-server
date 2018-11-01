@@ -9,12 +9,11 @@ from storemanager.api.v2 import api_blueprint, auth_blueprint
 
 def create_app(config_name):
     """Create app and register api"""
+    # app = Flask(__name__, instance_relative_config=True)
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(APP_CONFIG[config_name])
     app.config.from_pyfile('config.py')
-    app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
-    app.config['SECRET_KEY'] = os.environ.get('API_SECRET_KEY')
-    app.config['SWAGGER'] = {'title': 'STORE MANAGER API', 'uiversion': 3}
+    app.config['SWAGGER'] = {'title': 'Store Manager API', 'uiversion': 3}
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.register_blueprint(api_blueprint)
     app.register_blueprint(auth_blueprint)

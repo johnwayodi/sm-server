@@ -4,9 +4,10 @@ python:
 
 install:
 - pip install -r requirements.txt
-
+before_script:
+- psql -c 'create database STORE_DB;' -U postgres
 script:
-- pytest --cov=storemanager/api/v2/
+- pytest --cov=storemanager/api/v2
 
 after_success:
 - coveralls
