@@ -2,8 +2,8 @@ import os
 import psycopg2
 from storemanager.api.v2.database.config import config
 from flask import current_app
-from .queries import create_table_users, create_table_products, create_table_categories, \
-    create_table_sales, create_table_sale_items, drop_all_tables
+from .queries import CREATE_TABLE_USERS, CREATE_TABLE_PRODUCTS, CREATE_TABLE_CATEGORIES, \
+    CREATE_TABLE_SALES, CREATE_TABLE_SALE_ITEMS, DROP_ALL_TABLES
 
 
 class Database:
@@ -16,19 +16,21 @@ class Database:
 
     @classmethod
     def create_all_tables(cls):
+        print('Creating Tables')
         create_tables_query = [
-            create_table_users,
-            create_table_categories,
-            create_table_products,
-            create_table_sales,
-            create_table_sale_items
+            CREATE_TABLE_USERS,
+            CREATE_TABLE_CATEGORIES,
+            CREATE_TABLE_PRODUCTS,
+            CREATE_TABLE_SALES,
+            CREATE_TABLE_SALE_ITEMS
         ]
 
         conn = None
         for statement in create_tables_query:
             try:
-                params = config()
-                conn = psycopg2.connect(**params)
+                # params = config()
+                # conn = psycopg2.connect(**params)
+                conn = DB.connect()
                 cur = conn.cursor()
                 cur.execute(statement)
                 conn.commit()
@@ -41,13 +43,14 @@ class Database:
 
     @classmethod
     def drop_tables(cls):
-
+        print('Dropping Tables')
         conn = None
         try:
-            params = config()
-            conn = psycopg2.connect(**params)
+            # params = config()
+            # conn = psycopg2.connect(**params)
+            conn = DB.connect()
             cur = conn.cursor()
-            cur.execute(drop_all_tables)
+            cur.execute(DROP_ALL_TABLES)
             conn.commit()
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
@@ -55,3 +58,6 @@ class Database:
         finally:
             if conn is not None:
                 conn.close()
+
+
+DB = Database()

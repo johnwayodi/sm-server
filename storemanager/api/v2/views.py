@@ -42,7 +42,7 @@ class Product(Resource):
            description: Returned when value passed in as product_id is not an integer.
             """
         if product_id.isdigit():
-            result = ProductModel.get_by_id(get_product, (product_id,))
+            result = ProductModel.get_by_id(GET_PRODUCT, (product_id,))
             if result is None:
                 return {'message': 'product with id does not exist'}, 404
 
@@ -54,7 +54,7 @@ class Product(Resource):
             product.min_stock = result[4]
             product.description = result[5]
 
-            category_details = CategoryModel.get_by_id(get_category, (result[6],))
+            category_details = CategoryModel.get_by_id(GET_CATEGORY, (result[6],))
             category_name = category_details[1]
             product.category = category_name
 
@@ -88,7 +88,7 @@ class Product(Resource):
            description: Product with specified id does not exist.
             """
         current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
         if user_details[3] == "admin":
             if product_id.isdigit():
                 data = request.get_json()
@@ -99,19 +99,19 @@ class Product(Resource):
                 min_stock = data['min_stock']
                 category = data['category']
 
-                category_details = CategoryModel.get_by_name(get_category_by_name, (category,))
+                category_details = CategoryModel.get_by_name(GET_CATEGORY_BY_NAME, (category,))
                 if category_details is None:
                     return {'message': 'category provided does not exist'}, 404
                 category_id = category_details[0]
 
-                result = ProductModel.get_by_id(get_product, (product_id,))
+                result = ProductModel.get_by_id(GET_PRODUCT, (product_id,))
                 if result is None:
                     return {'message': 'product with id does not exist'}, 404
 
                 product = ProductModel()
                 product.id = result[0]
                 values = (name, description, price, stock, min_stock, category_id, product.id)
-                product.update(update_product, values)
+                product.update(UPDATE_PRODUCT, values)
                 return {'message': 'product updated successfully'}, 200
 
             return {'message': 'provided id is not an integer'}, 400
@@ -121,16 +121,16 @@ class Product(Resource):
     @jwt_required
     def delete(self, product_id):
         current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
         if user_details[3] == "admin":
             if product_id.isdigit():
-                result = ProductModel.get_by_id(get_product, (product_id,))
+                result = ProductModel.get_by_id(GET_PRODUCT, (product_id,))
                 if result is None:
                     return {'message': 'product with id does not exist'}, 404
 
                 product = ProductModel()
                 product.id = result[0]
-                product.delete(delete_product, (product_id,))
+                product.delete(DELETE_PRODUCT, (product_id,))
                 return {'message': 'product deleted successfully'}, 200
 
             return {'message': 'provided id is not an integer'}, 400
@@ -162,7 +162,7 @@ class ProductList(Resource):
            description: Bad Authorization Error, Ensure jwt key is in the proper format in header.
             """
         products = {}
-        result = ProductModel.get_all(get_all_products)
+        result = ProductModel.get_all(GET_ALL_PRODUCTS)
         for i in range(len(result)):
             product = ProductModel()
             product.id = result[i][0]
@@ -172,7 +172,7 @@ class ProductList(Resource):
             product.min_stock = result[i][4]
             product.description = result[i][5]
 
-            category_details = CategoryModel.get_by_id(get_category, (result[i][6],))
+            category_details = CategoryModel.get_by_id(GET_CATEGORY, (result[i][6],))
             category_name = category_details[1]
 
             product.category = category_name
@@ -231,7 +231,7 @@ class ProductList(Resource):
                description: Handles all Validation Errors
             """
         current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
         if user_details[3] == "admin":
             data = request.get_json()
             product_name = data['name']
@@ -271,10 +271,10 @@ class ProductList(Resource):
             if product_min_stock < 0:
                 return {'message': 'product minimum cannot be a negative or 0'}, 400
 
-            product = ProductModel.get_by_name(get_product_by_name, (product_name,))
+            product = ProductModel.get_by_name(GET_PRODUCT_BY_NAME, (product_name,))
             if product is not None:
                 return {'message': 'product already exists, consider updating attributes'}, 400
-            category_result = CategoryModel.get_by_name(get_category_by_name, (product_category,))
+            category_result = CategoryModel.get_by_name(GET_CATEGORY_BY_NAME, (product_category,))
             if category_result is None:
                 return {'message': 'category provided does not exist'}, 400
 
@@ -284,7 +284,7 @@ class ProductList(Resource):
                               product_min_stock, product_description, category_id)
 
             product = ProductModel()
-            result = product.save(create_product, product_values)
+            result = product.save(CREATE_PRODUCT, product_values)
             product.id = result[0]
             product.name = result[1]
             product.description = result[2]
@@ -292,7 +292,7 @@ class ProductList(Resource):
             product.stock = result[4]
             product.min_stock = result[5]
 
-            category_details = CategoryModel.get_by_id(get_category, (result[6],))
+            category_details = CategoryModel.get_by_id(GET_CATEGORY, (result[6],))
             category_name = category_details[1]
             product.category = category_name
 
@@ -331,7 +331,7 @@ class SaleRecord(Resource):
            description: Validation Error, Only an integer value can be accepted as valid
             """
         if s_id.isdigit():
-            sale_details = SaleRecordModel.get_by_id(get_sale, (s_id,))
+            sale_details = SaleRecordModel.get_by_id(GET_SALE, (s_id,))
             if sale_details is None:
                 return {'message': 'sale with given id does not exist'}, 404
 
@@ -340,7 +340,7 @@ class SaleRecord(Resource):
             sale.items = sale_details[1]
             sale.total = sale_details[2]
 
-            sale_products = SaleRecordModelItem.get_all_by_id(get_sale_items, (sale.id,))
+            sale_products = SaleRecordModelItem.get_all_by_id(GET_SALE_ITEMS, (sale.id,))
             products = {}
             for i in range(len(sale_products)):
                 product = {
@@ -380,7 +380,7 @@ class SaleRecords(Resource):
            description: empty, no sale record created yet
             """
         sales = {}
-        result = SaleRecordModel.get_all(get_all_sales)
+        result = SaleRecordModel.get_all(GET_ALL_SALES)
 
         for i in range(len(result)):
             sale = SaleRecordModel()
@@ -435,7 +435,7 @@ class SaleRecords(Resource):
             """
 
         current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
         if user_details[3] == "attendant":
             data = request.get_json()
             total_cost = 0
@@ -448,7 +448,7 @@ class SaleRecords(Resource):
             for i in range(len(items)):
                 cart_id = str(i + 1)
                 product_name = items[cart_id]['name']
-                product = ProductModel.get_by_name(get_product_by_name, (product_name,))
+                product = ProductModel.get_by_name(GET_PRODUCT_BY_NAME, (product_name,))
                 # return {'result': product}
                 if product is None:
                     return {'message': 'failed to create sale record',
@@ -462,7 +462,7 @@ class SaleRecords(Resource):
                             'reason': 'cannot sell past minimum stock for {}'.format(product_name)}, 400
 
                 new_stock_value = product[3] - quantity_in_cart
-                ProductModel.update_on_sale(update_product_after_sale, (new_stock_value, product[0]))
+                ProductModel.update_on_sale(UPDATE_PRODUCT_ON_SALE, (new_stock_value, product[0]))
 
                 product_info = (product_name, product_price, quantity_in_cart, cost)
 
@@ -474,7 +474,7 @@ class SaleRecords(Resource):
             sale = SaleRecordModel()
             sale.items = items_count
             sale.total = total_cost
-            result = sale.save(create_sale, (items_count, total_cost))
+            result = sale.save(CREATE_SALE, (items_count, total_cost))
             sale.id = result[0]
 
             products_in_sale = []
@@ -484,7 +484,7 @@ class SaleRecords(Resource):
                 # tuple(product)
                 products_in_sale.append(sale_item)
             sale_items = SaleRecordModelItem()
-            sale_items.save(create_sale_item, products_in_sale)
+            sale_items.save(CREATE_SALE_ITEM, products_in_sale)
             return {'message': 'Sale Record created successfully',
                     'sale': sale.as_dict()}, 201
 
@@ -513,7 +513,7 @@ class User(Resource):
            description: Error shown to Attendant trying to delete product
             """
         if u_id.isdigit():
-            user_details = UserModel.get_by_id(get_user, (u_id,))
+            user_details = UserModel.get_by_id(GET_USER, (u_id,))
             if user_details is None:
                 return {'message': 'user with id does not exist'}, 404
 
@@ -550,10 +550,10 @@ class User(Resource):
            description: Error for Attendant trying to delete product
             """
         current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
         if user_details[3] == "admin":
             if u_id.isdigit():
-                result = UserModel.get_by_id(get_user, (u_id,))
+                result = UserModel.get_by_id(GET_USER, (u_id,))
                 if result == {}:
                     return {'message': 'user with id does not exist'}, 404
 
@@ -577,10 +577,10 @@ class UserList(Resource):
            description: List of Users Returned Successful
             """
         current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
         if user_details[3] == "admin":
             users = {}
-            result = UserModel.get_all(get_all_users)
+            result = UserModel.get_all(GET_ALL_USERS)
 
             for i in range(len(result)):
                 user = UserModel()
@@ -654,12 +654,12 @@ class UserRegistration(Resource):
             return {'message': 'user role required, should not be empty'}, 400
 
         if data['role'] == 'admin' or data['role'] == 'attendant':
-            user_result = UserModel.get_by_name(get_user_by_name, (username,))
+            user_result = UserModel.get_by_name(GET_USER_BY_NAME, (username,))
             if user_result is not None:
                 return {'message': 'User already exists'}, 400
 
             user = UserModel()
-            saved_user = user.save(create_user, (username, password, role))
+            saved_user = user.save(CREATE_USER, (username, password, role))
             user.id = saved_user[0]
             user.username = saved_user[1]
             user.role = saved_user[2]
@@ -718,7 +718,7 @@ class UserLogin(Resource):
         if not password or password.isspace():
             return {'message': 'password is required, should not be empty'}, 400
 
-        user_result = UserModel.get_by_name(get_user_by_name, (username,))
+        user_result = UserModel.get_by_name(GET_USER_BY_NAME, (username,))
         if user_result is None:
             return {'message': 'user does not exist'}, 404
 
@@ -736,11 +736,28 @@ class Category(Resource):
 
     @jwt_required
     def get(self, category_id):
+        """
+       Retrieve a Single Category item
+       ---
+       parameters:
+         - in: path
+           name: category_id
+           type: string
+           required: true
+       responses:
+         200:
+           description: Displayed when user deleted successfully
+         404:
+           description: Displayed when no user is found with specified id
+         403:
+           description: Error shown to Attendant trying to delete product
+            """
+
         current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
         if user_details[3] == "admin":
             if category_id.isdigit():
-                result = CategoryModel.get_by_id(get_category, (category_id,))
+                result = CategoryModel.get_by_id(GET_CATEGORY, (category_id,))
                 if result is None:
                     return {'message': 'category with id does not exist'}, 404
                 else:
@@ -757,19 +774,19 @@ class Category(Resource):
     @jwt_required
     def put(self, category_id):
         current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
         if user_details[3] == "admin":
             if category_id.isdigit():
                 data = request.get_json()
                 name = data.get('name')
                 description = data.get('description')
-                result = CategoryModel.get_by_id(get_category, (category_id,))
+                result = CategoryModel.get_by_id(GET_CATEGORY, (category_id,))
                 if result is None:
                     return {'message': 'category with id does not exist'}, 404
 
                 category = CategoryModel()
                 category.id = result[0]
-                category.update(update_category, (name, description, category.id))
+                category.update(UPDATE_CATEGORY, (name, description, category.id))
                 return {'message': 'category updated successfully'}, 200
 
             return {'message': 'provided id is not an integer'}, 400
@@ -778,16 +795,16 @@ class Category(Resource):
     @jwt_required
     def delete(self, category_id):
         current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
         if user_details[3] == "admin":
             if category_id.isdigit():
-                result = CategoryModel.get_by_id(get_category, (category_id,))
+                result = CategoryModel.get_by_id(GET_CATEGORY, (category_id,))
                 if result is None:
                     return {'message': 'category with id does not exist'}, 404
 
                 category = CategoryModel()
                 category.id = result[0]
-                category.delete(delete_category, (category_id,))
+                category.delete(DELETE_CATEGORY, (category_id,))
                 return {'message': 'category deleted successfully'}, 200
 
             return {'message': 'provided id is not an integer'}, 400
@@ -800,10 +817,10 @@ class Categories(Resource):
     @jwt_required
     def get(self):
         current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
         if user_details[3] == "admin":
             categories = {}
-            result = CategoryModel.get_all(get_all_categories)
+            result = CategoryModel.get_all(GET_ALL_CATEGORIES)
 
             for i in range(len(result)):
                 category = CategoryModel()
@@ -820,7 +837,7 @@ class Categories(Resource):
     @expects_json(CATEGORY_SCHEMA)
     def post(self):
         current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(get_user_by_name, (current_user,))
+        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
         if user_details[3] == "admin":
             data = request.get_json()
             name = data.get('name')
@@ -831,7 +848,7 @@ class Categories(Resource):
                 return {'message': 'description cannot be an integer value'}, 400
 
             category = CategoryModel()
-            result = category.save(create_category, (name, description))
+            result = category.save(CREATE_CATEGORY, (name, description))
 
             category.id = result[0]
             category.name = result[1]
