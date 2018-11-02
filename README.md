@@ -5,7 +5,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/c23849e92db44dd7a9b2/maintainability)](https://codeclimate.com/github/johnwayodi/sm-api-v2/maintainability)
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/faa1bb2518cd81a3e91d)
 
-
+The app is hosted on heroku and can be found [here](https://jw-store-manager-apiv2.herokuapp.com/apidocs/)
 ## Testing and Usage
 To test the application locally, first configure the environment as follows:
 2. Install [PostgreSQL] if not already installed and ensure it is up and running.
