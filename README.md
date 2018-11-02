@@ -9,8 +9,8 @@ The app is hosted on heroku and can be found [here](https://jw-store-manager-api
 ## Testing and Usage
 To test the application locally, first configure the environment as follows:
 
-1. Install [PostgreSQL] if not already installed and ensure it is up and running.
-2. Ensure [Python3]() is installed
+1. Install [PostgreSQL](https://www.postgresql.org/) if not already installed and ensure it is up and running.
+2. Ensure [Python3](https://www.python.org/) is installed
 3. Create a folder on your computer, once in the newly created repository, clone the project by 
 running the following command:
     
@@ -39,7 +39,7 @@ Run the following command to install all the requirements for the application.
         
         flask run
 ## Endpoints
-The API exposes the following endpoints the
+The API exposes the following endpoints:
 1. #### Auth Endpoints
     The `/auth` endpoint allow the registration of users and a login route to allow registered
     users to log into the application 
@@ -102,7 +102,7 @@ The API exposes the following endpoints the
       <tr>
         <td>GET</td>
         <td>/products/{product_id}</td>
-        <td>Retrieve a single category, only accesible by admin</td>
+        <td>Retrieve a specific product</td>
       </tr>
       <tr>
         <td>PUT
@@ -117,7 +117,7 @@ The API exposes the following endpoints the
     </table>
 
 4. #### Sales Endpoints
-    The `/sales` endpoint allows all CRUD operations on sale items
+    The `/sales` endpoint allows the following operations on sale items
     <table style="width:100%">
       <tr>
         <td>POST</td>
@@ -146,5 +146,7 @@ The following software tools were used in the development of this application:
 5. [Coveralls](https://coveralls.io/) and [Code Climate](https://codeclimate.com/): For tracking and covering of testing. 
 6. [Pylint](https://www.pylint.org/): For code analysis.
 7. [Postman](https://www.getpostman.com/): For Manual Testing and generation of Documentation.
-8. [PostgreSQL](https://www.postgresql.org/): Database. 
-_TODO_: _update readme_.
+8. [PostgreSQL](https://www.postgresql.org/): Database.
+
+#### Contributors
+[John Wayodi](https://github.com/johnwayodi)
