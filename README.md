@@ -8,9 +8,10 @@
 The app is hosted on heroku and can be found [here](https://jw-store-manager-apiv2.herokuapp.com/apidocs/)
 ## Testing and Usage
 To test the application locally, first configure the environment as follows:
-2. Install [PostgreSQL] if not already installed and ensure it is up and running.
+
+1. Install [PostgreSQL] if not already installed and ensure it is up and running.
 2. Ensure [Python3]() is installed
-2. Create a folder on your computer, once in the newly created repository, clone the project by 
+3. Create a folder on your computer, once in the newly created repository, clone the project by 
 running the following command:
     
     `git clone https://github.com/johnwayodi/sm-api-v2.git`
