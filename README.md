@@ -6,7 +6,7 @@
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/faa1bb2518cd81a3e91d)
 
 
-##Testing and Usage
+## Testing and Usage
 To test the application locally, first configure the environment as follows:
 2. Install [PostgreSQL] if not already installed and ensure it is up and running.
 2. Ensure [Python3]() is installed
@@ -39,7 +39,7 @@ Run the following command to install all the requirements for the application.
         flask run
 ## Endpoints
 The API exposes the following endpoints the
-1. ####Auth Endpoints
+1. #### Auth Endpoints
     The `/auth` endpoint allow the registration of users and a login route to allow registered
     users to log into the application 
     <table style="width:100%">
@@ -55,7 +55,7 @@ The API exposes the following endpoints the
       </tr>
     </table>
 
-2. ####Category Endpoints
+2. #### Category Endpoints
     The `/category` endpoint allows all the CRUD operations on the category items.
     <table style="width:100%">
       <tr>
@@ -85,7 +85,7 @@ The API exposes the following endpoints the
       </tr>
     </table>
 
-3. ####Product Endpoints
+3. #### Product Endpoints
     The `/products` endpoint allows all CRUD operations on product items
     <table style="width:100%">
       <tr>
@@ -115,7 +115,7 @@ The API exposes the following endpoints the
       </tr>
     </table>
 
-4. ####Sales Endpoints
+4. #### Sales Endpoints
     The `/sales` endpoint allows all CRUD operations on sale items
     <table style="width:100%">
       <tr>
@@ -135,7 +135,7 @@ The API exposes the following endpoints the
       </tr>
     </table>
  
-##Technologies used
+## Technologies used
 The following software tools were used in the development of this application:
 1. [Python](https://www.python.org/): Programming language.
 1. [Flask](http://flask.pocoo.org/): The underlying web framework.
