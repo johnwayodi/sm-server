@@ -11,6 +11,5 @@ Database.create_all_tables()
 jwt = JWTManager(app)
 swagger = Swagger(app)
 
-
 if __name__ == '__main__':
     app.run()
