@@ -1,7 +1,6 @@
 import os
 import psycopg2
 from storemanager.api.v2.database.config import config
-from flask import current_app
 from .queries import *
 
 

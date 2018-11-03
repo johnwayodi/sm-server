@@ -1,12 +1,22 @@
-from flask import request
+from flask import request, abort
 from flask_expects_json import expects_json
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import Resource
 
 from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.models.category import CategoryModel
-from storemanager.api.v2.models.schemas import CATEGORY_SCHEMA
 from storemanager.api.v2.models.user import UserModel
+from storemanager.api.v2.utils.validators import CustomValidator
+
+CATEGORY_SCHEMA = {
+    'type': 'object',
+    'maxProperties': 2,
+    'properties': {
+        'name': {'type': 'string'},
+        'description': {'type': 'string'},
+    },
+    'required': ['name', 'description']
+}
 
 
 class Category(Resource):
@@ -119,15 +129,18 @@ class Categories(Resource):
         user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
         if user_details[3] == "admin":
             data = request.get_json()
-            name = data.get('name')
-            description = data.get('description')
-            if name.isdigit():
-                return {'message': 'name cannot be an integer value'}, 400
-            if description.isdigit():
-                return {'message': 'description cannot be an integer value'}, 400
+            category_name = data['name']
+            description = data['description']
 
+            c_name = category_name.lower().strip()
+            CustomValidator.validate_category_details(c_name, description)
+
+            category = CategoryModel.get_by_name(
+                GET_CATEGORY_BY_NAME, (c_name,))
+            if category is not None:
+                abort(400, 'category already exists')
             category = CategoryModel()
-            result = category.save(CREATE_CATEGORY, (name, description))
+            result = category.save(CREATE_CATEGORY, (c_name, description))
 
             category.id = result[0]
             category.name = result[1]

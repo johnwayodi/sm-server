@@ -1,11 +1,33 @@
 from flask import request
+from flask_expects_json import expects_json
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import Resource
 
 from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.models.product import ProductModel
-from storemanager.api.v2.models.sale_record import SaleRecordModel, SaleRecordModelItem
+from storemanager.api.v2.models.sale_record import *
 from storemanager.api.v2.models.user import UserModel
+from storemanager.api.v2.utils.validators import CustomValidator
+
+SALES_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "products": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string"},
+                    "count": {"type": "integer"}
+                },
+                "required": ["name", "count"]
+            }
+        }
+    },
+    "required": [
+        "products"
+    ]
+}
 
 
 class SaleRecord(Resource):
@@ -106,6 +128,7 @@ class SaleRecords(Resource):
         return {'sales': sales}, 200
 
     @jwt_required
+    @expects_json(SALES_SCHEMA)
     def post(self):
         """
        Create a Sale Record
@@ -156,32 +179,39 @@ class SaleRecords(Resource):
             total_cost = 0
             items_count = 0
             products = []
-            # product = None
 
             items = data['products']
 
             for i in range(len(items)):
-                cart_id = str(i + 1)
-                product_name = items[cart_id]['name']
+                product_name = items[i]['name']
+                quantity_in_cart = items[i]['count']
+                p_name = product_name.lower().strip()
+
+                CustomValidator.validate_sale_items(
+                    p_name, quantity_in_cart)
+
                 product = ProductModel.get_by_name(
-                    GET_PRODUCT_BY_NAME, (product_name,))
-                # return {'result': product}
+                    GET_PRODUCT_BY_NAME, (p_name,))
                 if product is None:
                     return {'message': 'failed to create sale record',
-                            'reason': 'product named {} does not exist'.format(product_name)}, 400
+                            'reason': 'product named {} does '
+                                      'not exist'.format(p_name)}, 400
 
-                quantity_in_cart = items[cart_id].get('count')
                 product_price = product[2]
                 cost = product_price * quantity_in_cart
                 if product[3] - quantity_in_cart < product[4]:
                     return {'message': 'failed to create sale record',
-                            'reason': 'cannot sell past minimum stock for {}'.format(product_name)}, 400
+                            'reason': 'cannot sell past minimum '
+                                      'stock for {}'.format(p_name)}, 400
 
                 new_stock_value = product[3] - quantity_in_cart
                 ProductModel.update_on_sale(
                     UPDATE_PRODUCT_ON_SALE, (new_stock_value, product[0]))
 
-                product_info = (product_name, product_price, quantity_in_cart, cost)
+                product_info = (product_name,
+                                product_price,
+                                quantity_in_cart,
+                                cost)
 
                 products.append(product_info)
 

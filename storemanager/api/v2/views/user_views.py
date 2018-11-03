@@ -1,11 +1,33 @@
 from flask import request
 from flask_expects_json import expects_json
-from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
+from flask_jwt_extended import jwt_required, create_access_token, \
+    get_jwt_identity
 from flask_restful import Resource
 
 from storemanager.api.v2.database.queries import *
-from storemanager.api.v2.models.schemas import USER_LOGIN_SCHEMA, USER_REGISTRATION_SCHEMA
 from storemanager.api.v2.models.user import UserModel
+from storemanager.api.v2.utils.validators import CustomValidator
+
+USER_REGISTRATION_SCHEMA = {
+    'type': 'object',
+    'maxProperties': 3,
+    'properties': {
+        'username': {'type': 'string'},
+        'password': {'type': 'string'},
+        'role': {'type': 'string'}
+    },
+    'required': ['username', 'password', 'role']
+}
+
+USER_LOGIN_SCHEMA = {
+    'type': 'object',
+    'maxProperties': 2,
+    'properties': {
+        'username': {'type': 'string'},
+        'password': {'type': 'string'}
+    },
+    'required': ['username', 'password']
+}
 
 
 class User(Resource):
@@ -155,31 +177,16 @@ class UserRegistration(Resource):
         password = data['password']
         role = data['role']
 
-        # validation checks for username
-        if isinstance(username, (int, float)):
-            return {'message': 'username cannot be an integer value'}, 400
-        if not username or username.isspace():
-            return {
-                       'message': 'username required should not be empty'
-                   }, 400
-
-        # validation checks for password
-        if not password or password.isspace():
-            return {'message': 'password is required, should not be empty'}, 400
-
-        # validation checks for product name
-        if isinstance(role, (int, float)):
-            return {'message': 'user role cannot be an integer value'}, 400
-        if not role or role.isspace():
-            return {'message': 'user role required, should not be empty'}, 400
+        uname = username.lower().strip()
+        CustomValidator.validate_register_details(uname, password, role)
 
         if data['role'] == 'admin' or data['role'] == 'attendant':
-            user_result = UserModel.get_by_name(GET_USER_BY_NAME, (username,))
+            user_result = UserModel.get_by_name(GET_USER_BY_NAME, (uname,))
             if user_result is not None:
                 return {'message': 'User already exists'}, 400
 
             user = UserModel()
-            saved_user = user.save(CREATE_USER, (username, password, role))
+            saved_user = user.save(CREATE_USER, (uname, password, role))
             user.id = saved_user[0]
             user.username = saved_user[1]
             user.role = saved_user[2]
@@ -228,24 +235,19 @@ class UserLogin(Resource):
         username = data['username']
         password = data['password']
 
-        # validation checks for username
-        if isinstance(username, (int, float)):
-            return {'message': 'username cannot be an integer value'}, 400
-        if not username or username.isspace():
-            return {'message': 'username required should not be empty'}, 400
+        uname = username.lower().strip()
 
-        # validation checks for password
-        if not password or password.isspace():
-            return {'message': 'password is required, should not be empty'}, 400
+        CustomValidator.validate_login_details(uname, password)
 
-        user_result = UserModel.get_by_name(GET_USER_BY_NAME, (username,))
+        user_result = UserModel.get_by_name(GET_USER_BY_NAME, (uname,))
         if user_result is None:
             return {'message': 'user does not exist'}, 404
 
-        if user_result[1] == username and user_result[2] == password:
-            access_token = create_access_token(identity=username)
+        if user_result[1] == uname and user_result[2] == password:
+            access_token = create_access_token(identity=uname)
             return {'message': 'login successful',
                     'access_token': access_token}, 200
 
-        if user_result[1] == username and user_result[2] != password:
-            return {'message': 'wrong username or password, Try Again'}, 400
+        if user_result[1] == uname and user_result[2] != password:
+            return {'message': 'wrong username or password, '
+                               'Try Again'}, 400

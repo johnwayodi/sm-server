@@ -7,7 +7,22 @@ from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.models.category import CategoryModel
 from storemanager.api.v2.models.product import ProductModel
 from storemanager.api.v2.models.user import UserModel
-from storemanager.api.v2.models.schemas import PRODUCT_SCHEMA
+from storemanager.api.v2.utils.validators import CustomValidator
+
+PRODUCT_SCHEMA = {
+    'type': 'object',
+    'maxProperties': 6,
+    'properties': {
+        'name': {'type': 'string'},
+        'price': {'type': 'integer'},
+        'description': {'type': 'string'},
+        'category': {'type': 'string'},
+        'stock': {'type': 'integer'},
+        'min_stock': {'type': 'integer'},
+    },
+    'required': ['name', 'price', 'description',
+                 'category', 'stock', 'min_stock']
+}
 
 
 class Product(Resource):
@@ -248,41 +263,13 @@ class ProductList(Resource):
             product_stock = data['stock']
             product_min_stock = data['min_stock']
 
-            # validation checks for product name
-            if product_name.isdigit():
-                return {
-                           'message': 'name cannot be an integer value'
-                       }, 400
-            if not product_name or product_name.isspace():
-                return {'message': 'name should not be empty'}, 400
+            p_name = product_name.lower().strip()
+            p_cat = product_category.lower().strip()
 
-            # validation checks for product price
-            if product_price < 0:
-                return {
-                           'message': 'price cannot be a negative or 0'
-                       }, 400
-
-            # validation checks for product description
-            if product_description.isdigit():
-                return {
-                           'message': 'category cannot be an integer value'
-                       }, 400
-            if not product_description or product_description.isspace():
-                return {'message': 'category should not be empty'}, 400
-
-            # validation checks for product category
-            if product_category.isdigit():
-                return {'message': 'category cannot be an integer value'}, 400
-            if not product_category or product_category.isspace():
-                return {'message': 'category should not be empty'}, 400
-
-            # validation checks for product stock
-            if product_stock < 0:
-                return {'message': 'stock cannot be a negative or 0'}, 400
-
-            # validation checks for product minimum stock
-            if product_min_stock < 0:
-                return {'message': 'minimum cannot be a negative or 0'}, 400
+            CustomValidator.validate_product_details(
+                p_name, product_price, product_description,
+                p_cat, product_stock, product_min_stock
+            )
 
             product = ProductModel.get_by_name(
                 GET_PRODUCT_BY_NAME, (product_name,))
