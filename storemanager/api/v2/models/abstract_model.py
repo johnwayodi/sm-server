@@ -9,18 +9,20 @@ from storemanager.api.v2.database.database import DB
 
 class AbstractModel:
     """ Model class for AbstractModel. """
+    conn = None
+    result_row = None
 
     def __init__(self):
         self.id = int
 
     def save(self, statement, values):
         """create a new item using the entity details specified"""
-        conn = None
-        result_row = None
+        # conn = None
+        # result_row = None
         try:
-            # params = config()
-            # conn = psycopg2.connect(**params)
-            conn = DB.connect()
+            params = config()
+            conn = psycopg2.connect(**params)
+            # conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, values)
             result_row = cur.fetchone()
@@ -39,9 +41,9 @@ class AbstractModel:
         conn = None
         result_row = None
         try:
-            # params = config()
-            # conn = psycopg2.connect(**params)
-            conn = DB.connect()
+            params = config()
+            conn = psycopg2.connect(**params)
+            # conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, value)
             result_row = cur.fetchone()
@@ -60,9 +62,9 @@ class AbstractModel:
         conn = None
         rows_deleted = 0
         try:
-            # params = config()
-            # conn = psycopg2.connect(**params)
-            conn = DB.connect()
+            params = config()
+            conn = psycopg2.connect(**params)
+            # conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, value)
             rows_deleted = cur.rowcount
@@ -81,9 +83,9 @@ class AbstractModel:
         conn = None
         rows_updated = 0
         try:
-            # params = config()
-            # conn = psycopg2.connect(**params)
-            conn = DB.connect()
+            params = config()
+            conn = psycopg2.connect(**params)
+            # conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, values)
             rows_updated = cur.rowcount
@@ -103,9 +105,9 @@ class AbstractModel:
         conn = None
         result_rows = None
         try:
-            # params = config()
-            # conn = psycopg2.connect(**params)
-            conn = DB.connect()
+            params = config()
+            conn = psycopg2.connect(**params)
+            # conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement)
             result_rows = cur.fetchall()
@@ -125,9 +127,9 @@ class AbstractModel:
         conn = None
         result_rows = None
         try:
-            # params = config()
-            # conn = psycopg2.connect(**params)
-            conn = DB.connect()
+            params = config()
+            conn = psycopg2.connect(**params)
+            # conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, values)
             result_rows = cur.fetchall()
@@ -147,9 +149,9 @@ class AbstractModel:
         conn = None
         result_row = None
         try:
-            # params = config()
-            # conn = psycopg2.connect(**params)
-            conn = DB.connect()
+            params = config()
+            conn = psycopg2.connect(**params)
+            # conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, value)
             result_row = cur.fetchone()

@@ -21,7 +21,8 @@ PRODUCT_SCHEMA = {
         'stock': {'type': 'integer'},
         'min_stock': {'type': 'integer'},
     },
-    'required': ['name', 'price', 'description', 'category', 'stock', 'min_stock']
+    'required': ['name', 'price', 'description',
+                 'category', 'stock', 'min_stock']
 }
 
 USER_REGISTRATION_SCHEMA = {
