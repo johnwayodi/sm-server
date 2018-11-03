@@ -57,7 +57,7 @@ class Category(Resource):
                         'category': category.as_dict()}, 200
 
             return {'message': 'provided id is not an integer'}, 400
-        return {'message': 'only an admin can view categories'}
+        return {'message': 'only an admin can view categories'}, 401
 
     @jwt_required
     def put(self, category_id):
@@ -80,7 +80,7 @@ class Category(Resource):
                 return {'message': 'category updated successfully'}, 200
 
             return {'message': 'provided id is not an integer'}, 400
-        return {'message': 'only an admin can update a category'}
+        return {'message': 'only an admin can update a category'}, 401
 
     @jwt_required
     def delete(self, category_id):
@@ -98,7 +98,7 @@ class Category(Resource):
                 return {'message': 'category deleted successfully'}, 200
 
             return {'message': 'provided id is not an integer'}, 400
-        return {'message': 'only an admin can delete a product'}
+        return {'message': 'only an admin can delete a category'}, 401
 
 
 class Categories(Resource):
@@ -119,9 +119,9 @@ class Categories(Resource):
                 category.description = result[i][2]
                 categories[i + 1] = category.as_dict()
             if categories == {}:
-                return {'message': 'no categories added yet'}
+                return {'message': 'no categories added yet'}, 404
             return {'categories': categories}, 200
-        return {'message': 'only an admin can view categories'}
+        return {'message': 'only an admin can view categories'}, 401
 
     @jwt_required
     @expects_json(CATEGORY_SCHEMA)
@@ -148,4 +148,4 @@ class Categories(Resource):
             category.description = result[2]
             return {'message': 'category created',
                     'category': category.as_dict()}, 201
-        return {'message': 'only an admin can add a category'}
+        return {'message': 'only an admin can add a category'}, 401

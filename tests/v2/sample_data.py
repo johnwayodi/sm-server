@@ -52,6 +52,10 @@ CATEGORIES = {
         "name": "Furniture",
         "description": "this is the furniture category"
     },
+    "category2": {
+        "name": "Electronics",
+        "description": "this is the electronics category"
+    },
     "category3": {
         "name": "Food",
         "description": "this is the Food category"
@@ -60,9 +64,17 @@ CATEGORIES = {
         "name": "Accessories",
         "description": "this is the Accessories category"
     },
-    "category2": {
-        "name": "Electronics",
+    "category5": {
+        "name": "12345",
         "description": "this is the electronics category"
+    },
+    "category6": {
+        "name": " ",
+        "description": "this is the electronics category"
+    },
+    "category7": {
+        "name": "Home",
+        "description": "123456"
     }
 }
 
@@ -97,6 +109,46 @@ SALE_RECORDS = {
             {
                 'name': 'Couch',
                 "count": 10
+            }
+        ]
+    },
+    "sale3": {
+        "products": [
+            {
+                "name": "Table",
+                "count": -2
+            }
+        ]
+    },
+    "sale4": {
+        "products": [
+            {
+                "name": "Table",
+                "count": 0
+            }
+        ]
+    },
+    "sale5": {
+        "products": [
+            {
+                "name": "Chocolate",
+                "count": 10
+            }
+        ]
+    },
+    "sale6": {
+        "products": [
+            {
+                "name": "1234",
+                "count": 10
+            }
+        ]
+    },
+    "sale7": {
+        "products": [
+            {
+                "name": "Table",
+                "count": 100000
             }
         ]
     }

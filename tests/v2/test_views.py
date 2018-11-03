@@ -6,6 +6,17 @@ import json
 from tests.v2.sample_data import *
 
 
+def test_admin_add_category_empty(client, authorize_admin):
+    """admin should be able to get empty category list message"""
+    headers = authorize_admin
+    expected_result = 'no categories added yet'
+
+    response = client.get('/api/v2/categories', headers=headers)
+    data = response.json
+    assert response.status_code == 404
+    assert data['message'] == expected_result
+
+
 def test_admin_add_category(client, authorize_admin):
     """admin should be able to add category"""
     headers = authorize_admin
@@ -20,6 +31,54 @@ def test_admin_add_category(client, authorize_admin):
     data = response.json
     assert response.status_code == 201
     assert data['category'] == expected_result
+
+
+def test_admin_add_category_existing(client, authorize_admin):
+    """admin should not be able to add an already existing category"""
+    headers = authorize_admin
+    expected_result = 'category already exists'
+
+    response = client.post('/api/v2/categories',
+                           data=json.dumps(CATEGORIES['category1']), headers=headers)
+    data = response.json
+    assert response.status_code == 400
+    assert data['message'] == expected_result
+
+
+def test_admin_add_category_numbered(client, authorize_admin):
+    """admin should not be able to add category whose name is numbers"""
+    headers = authorize_admin
+    expected_result = 'name cannot be an integer value'
+
+    response = client.post('/api/v2/categories',
+                           data=json.dumps(CATEGORIES['category5']), headers=headers)
+    data = response.json
+    assert response.status_code == 400
+    assert data['message'] == expected_result
+
+
+def test_admin_add_category_empty_name(client, authorize_admin):
+    """admin should not be able to add category with empty name"""
+    headers = authorize_admin
+    expected_result = 'please provide a category name'
+
+    response = client.post('/api/v2/categories',
+                           data=json.dumps(CATEGORIES['category6']), headers=headers)
+    data = response.json
+    assert response.status_code == 400
+    assert data['message'] == expected_result
+
+
+def test_admin_add_category_desc_numbered(client, authorize_admin):
+    """admin should not be able to add category whose description is numbers"""
+    headers = authorize_admin
+    expected_result = 'description cannot be an integer value'
+
+    response = client.post('/api/v2/categories',
+                           data=json.dumps(CATEGORIES['category7']), headers=headers)
+    data = response.json
+    assert response.status_code == 400
+    assert data['message'] == expected_result
 
 
 def test_admin_get_category(client, authorize_admin):
@@ -121,6 +180,7 @@ def test_admin_get_all_products(client, authorize_admin):
     assert response.status_code == 200
     assert len(products) == 4
 
+
 def test_admin_get_one_product(client, authorize_admin):
     """admin should be able to get a single product"""
     headers = authorize_admin
@@ -190,6 +250,63 @@ def test_admin_get_one_sale_empty(client, authorize_admin):
     assert data['message'] == expected_message
 
 
+def test_attendant_add_category(client, authorize_attendant):
+    """attendant should not be able to add category"""
+    headers = authorize_attendant
+    expected_message = 'only an admin can add a category'
+
+    response = client.post('/api/v2/categories',
+                           data=json.dumps(CATEGORIES['category1']), headers=headers)
+    data = response.json
+    assert response.status_code == 401
+    assert data['message'] == expected_message
+
+
+def test_attendant_get_category(client, authorize_attendant):
+    """attendant should not be able to get a category"""
+    headers = authorize_attendant
+    expected_message = 'only an admin can view categories'
+
+    response = client.get('/api/v2/categories/{:d}'.format(1), headers=headers)
+    data = response.json
+    assert response.status_code == 401
+    assert data['message'] == expected_message
+
+
+def test_attendant_get_categories(client, authorize_attendant):
+    """attendant should not be able to get all categories"""
+    headers = authorize_attendant
+
+    expected_message = 'only an admin can view categories'
+    response = client.get('/api/v2/categories', headers=headers)
+    data = response.json
+
+    assert response.status_code == 401
+    assert data['message'] == expected_message
+
+
+def test_attendant_update_category(client, authorize_attendant):
+    """attendant should not be able to get a category"""
+    headers = authorize_attendant
+    expected_message = 'only an admin can update a category'
+
+    response = client.put('/api/v2/categories/2', data=json.dumps(UPDATED_CATEGORY),
+                          headers=headers)
+    data = response.json
+    assert response.status_code == 401
+    assert data['message'] == expected_message
+
+
+def test_attendant_delete_category(client, authorize_attendant):
+    """attendant should not be able to delete a category"""
+    headers = authorize_attendant
+    expected_message = 'only an admin can delete a category'
+    response = client.delete('/api/v2/categories/{:d}'.format(3), headers=headers)
+    data = response.get_json()
+    assert response.status_code == 401
+    assert data['message'] == expected_message
+
+
 def test_attendant_add_product(client, authorize_attendant):
     """attendant should not be able to add new product"""
     headers = authorize_attendant
@@ -256,6 +373,56 @@ def test_attendant_add_sale(client, authorize_attendant):
     assert response.status_code == 201
     assert data['sale']['items'] == 12
     assert data['sale']['total'] == 320000
+
+
+def test_attendant_add_sale_excess(client, authorize_attendant):
+    """attendant should not be able to sell more than available products"""
+    headers = authorize_attendant
+    response = client.post('/api/v2/sales', data=json.dumps(SALE_RECORDS['sale7']), headers=headers)
+    data = response.json
+    expected_response = 'failed to create sale record'
+    assert response.status_code == 400
+    assert data['message'] == expected_response
+
+
+def test_attendant_add_sale_negative(client, authorize_attendant):
+    """attendant should not be able to create sale with count of negative"""
+    headers = authorize_attendant
+    response = client.post('/api/v2/sales', data=json.dumps(SALE_RECORDS['sale3']), headers=headers)
+    data = response.json
+    expected_response = 'product count cannot be negative'
+    assert response.status_code == 400
+    assert data['message'] == expected_response
+
+
+def test_attendant_add_sale_zero(client, authorize_attendant):
+    """attendant should not be able to create sale with count of 0"""
+    headers = authorize_attendant
+    response = client.post('/api/v2/sales', data=json.dumps(SALE_RECORDS['sale4']), headers=headers)
+    data = response.json
+    expected_response = 'product count must be 1 and above'
+    assert response.status_code == 400
+    assert data['message'] == expected_response
+
+
+def test_attendant_add_sale_non_existent(client, authorize_attendant):
+    """attendant should not be able to sell product that doesn't exist"""
+    headers = authorize_attendant
+    response = client.post('/api/v2/sales', data=json.dumps(SALE_RECORDS['sale5']), headers=headers)
+    data = response.json
+    expected_response = 'failed to create sale record'
+    assert response.status_code == 400
+    assert data['message'] == expected_response
+
+
+def test_attendant_add_sale_number(client, authorize_attendant):
+    """attendant should not be able to sell product name which is only numbers"""
+    headers = authorize_attendant
+    response = client.post('/api/v2/sales', data=json.dumps(SALE_RECORDS['sale6']), headers=headers)
+    data = response.json
+    expected_response = 'name cannot be an integer value'
+    assert response.status_code == 400
+    assert data['message'] == expected_response
 
 
 def test_attendant_get_all_sales(client, authorize_attendant):
