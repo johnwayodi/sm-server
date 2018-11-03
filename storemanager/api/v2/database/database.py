@@ -8,7 +8,9 @@ class Database:
 
     def connect(self):
 
-        conn = psycopg2.connect(os.environ['DATABASE_URL'], sslmode='require')
+        params = config()
+        conn = psycopg2.connect(**params)
+        # conn = psycopg2.connect(os.environ['DATABASE_URL'], sslmode='require')
 
         return conn
 
@@ -26,9 +28,7 @@ class Database:
         conn = None
         for statement in create_tables_query:
             try:
-                params = config()
-                conn = psycopg2.connect(**params)
-                # conn = DB.connect()
+                conn = DB.connect()
                 cur = conn.cursor()
                 cur.execute(statement)
                 conn.commit()
@@ -44,9 +44,7 @@ class Database:
         print('Dropping Tables')
         conn = None
         try:
-            params = config()
-            conn = psycopg2.connect(**params)
-            # conn = DB.connect()
+            conn = DB.connect()
             cur = conn.cursor()
             cur.execute(DROP_ALL_TABLES)
             conn.commit()

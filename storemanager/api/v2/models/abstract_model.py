@@ -6,23 +6,23 @@ import psycopg2
 from storemanager.api.v2.database.config import config
 from storemanager.api.v2.database.database import DB
 
+conn = None
+result_row = None
+rows_deleted = 0
+rows_updated = 0
+
 
 class AbstractModel:
     """ Model class for AbstractModel. """
-    conn = None
-    result_row = None
 
     def __init__(self):
         self.id = int
 
     def save(self, statement, values):
         """create a new item using the entity details specified"""
-        # conn = None
-        # result_row = None
+        global conn, result_row
         try:
-            params = config()
-            conn = psycopg2.connect(**params)
-            # conn = DB.connect()
+            conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, values)
             result_row = cur.fetchone()
@@ -38,12 +38,9 @@ class AbstractModel:
     @classmethod
     def get_by_id(cls, statement, value):
         """Retrieve the entity with the specified id"""
-        conn = None
-        result_row = None
+        global conn, result_row
         try:
-            params = config()
-            conn = psycopg2.connect(**params)
-            # conn = DB.connect()
+            conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, value)
             result_row = cur.fetchone()
@@ -59,12 +56,9 @@ class AbstractModel:
 
     def delete(self, statement, value):
         """Delete the entity with the specified id"""
-        conn = None
-        rows_deleted = 0
+        global conn, rows_deleted
         try:
-            params = config()
-            conn = psycopg2.connect(**params)
-            # conn = DB.connect()
+            conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, value)
             rows_deleted = cur.rowcount
@@ -80,12 +74,9 @@ class AbstractModel:
 
     def update(self, statement, values):
         """Update the entity with the specified id"""
-        conn = None
-        rows_updated = 0
+        global conn, rows_updated
         try:
-            params = config()
-            conn = psycopg2.connect(**params)
-            # conn = DB.connect()
+            conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, values)
             rows_updated = cur.rowcount
@@ -102,12 +93,9 @@ class AbstractModel:
     @classmethod
     def get_all(cls, statement):
         """Returns multiple rows of the type of entity"""
-        conn = None
-        result_rows = None
+        global conn, result_rows
         try:
-            params = config()
-            conn = psycopg2.connect(**params)
-            # conn = DB.connect()
+            conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement)
             result_rows = cur.fetchall()
@@ -124,12 +112,9 @@ class AbstractModel:
     @classmethod
     def get_all_by_id(cls, statement, values):
         """Returns all entities which contain the specified id"""
-        conn = None
-        result_rows = None
+        global conn, result_rows
         try:
-            params = config()
-            conn = psycopg2.connect(**params)
-            # conn = DB.connect()
+            conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, values)
             result_rows = cur.fetchall()
@@ -146,12 +131,9 @@ class AbstractModel:
     @classmethod
     def get_by_name(cls, statement, value):
         """Returns the entity with the specified name"""
-        conn = None
-        result_row = None
+        global conn, result_row
         try:
-            params = config()
-            conn = psycopg2.connect(**params)
-            # conn = DB.connect()
+            conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, value)
             result_row = cur.fetchone()
