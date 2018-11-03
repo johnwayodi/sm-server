@@ -67,6 +67,7 @@ class Category(Resource):
             if category_id.isdigit():
                 data = request.get_json()
                 name = data.get('name')
+                c_name = name.lower().strip()
                 description = data.get('description')
                 result = CategoryModel.get_by_id(GET_CATEGORY, (category_id,))
                 if result is None:
@@ -75,7 +76,7 @@ class Category(Resource):
                 category = CategoryModel()
                 category.id = result[0]
                 category.update(
-                    UPDATE_CATEGORY, (name, description, category.id))
+                    UPDATE_CATEGORY, (c_name, description, category.id))
                 return {'message': 'category updated successfully'}, 200
 
             return {'message': 'provided id is not an integer'}, 400

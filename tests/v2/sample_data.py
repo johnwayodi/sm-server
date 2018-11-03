@@ -52,10 +52,6 @@ CATEGORIES = {
         "name": "Furniture",
         "description": "this is the furniture category"
     },
-    "category2": {
-        "name": "Electronics",
-        "description": "this is the electronics category"
-    },
     "category3": {
         "name": "Food",
         "description": "this is the Food category"
@@ -63,6 +59,10 @@ CATEGORIES = {
     "category4": {
         "name": "Accessories",
         "description": "this is the Accessories category"
+    },
+    "category2": {
+        "name": "Electronics",
+        "description": "this is the electronics category"
     }
 }
 
@@ -73,32 +73,32 @@ UPDATED_CATEGORY = {
 
 SALE_RECORDS = {
     "sale1": {
-        "products": {
-            "1": {
+        "products": [
+            {
                 "name": "Table",
                 "count": 2
             },
-            "2": {
+            {
                 "name": "Television",
                 "count": 10
             }
-        }
+        ]
     },
     "sale2": {
-        "products": {
-            "1": {
+        "products": [
+            {
                 "name": "Table",
                 "count": 2
             },
-            "2": {
+            {
                 'name': 'Phone',
                 "count": 2
             },
-            "3": {
+            {
                 'name': 'Couch',
                 "count": 10
             }
-        }
+        ]
     }
 }
 

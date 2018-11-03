@@ -185,6 +185,7 @@ class SaleRecords(Resource):
             for i in range(len(items)):
                 product_name = items[i]['name']
                 quantity_in_cart = items[i]['count']
+
                 p_name = product_name.lower().strip()
 
                 CustomValidator.validate_sale_items(
@@ -208,7 +209,7 @@ class SaleRecords(Resource):
                 ProductModel.update_on_sale(
                     UPDATE_PRODUCT_ON_SALE, (new_stock_value, product[0]))
 
-                product_info = (product_name,
+                product_info = (p_name,
                                 product_price,
                                 quantity_in_cart,
                                 cost)

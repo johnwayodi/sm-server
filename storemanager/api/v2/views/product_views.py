@@ -115,8 +115,10 @@ class Product(Resource):
                 min_stock = data['min_stock']
                 category = data['category']
 
+                p_name = name.lower().strip()
+                p_cat = category.lower().strip()
                 category_details = CategoryModel.get_by_name(
-                    GET_CATEGORY_BY_NAME, (category,))
+                    GET_CATEGORY_BY_NAME, (p_cat,))
                 if category_details is None:
                     return {'message': 'category provided does not exist'}, 404
                 category_id = category_details[0]
@@ -127,7 +129,7 @@ class Product(Resource):
 
                 product = ProductModel()
                 product.id = result[0]
-                values = (name, description, price, stock,
+                values = (p_name, description, price, stock,
                           min_stock, category_id, product.id)
                 product.update(UPDATE_PRODUCT, values)
                 return {'message': 'product updated successfully'}, 200
@@ -272,17 +274,17 @@ class ProductList(Resource):
             )
 
             product = ProductModel.get_by_name(
-                GET_PRODUCT_BY_NAME, (product_name,))
+                GET_PRODUCT_BY_NAME, (p_name,))
             if product is not None:
                 return {'message': 'product already exists'}, 400
             category_result = CategoryModel.get_by_name(
-                GET_CATEGORY_BY_NAME, (product_category,))
+                GET_CATEGORY_BY_NAME, (p_cat,))
             if category_result is None:
                 return {'message': 'category provided does not exist'}, 400
 
             category_id = category_result[0]
 
-            product_values = (product_name, product_price,
+            product_values = (p_name, product_price,
                               product_stock, product_min_stock,
                               product_description, category_id)
 

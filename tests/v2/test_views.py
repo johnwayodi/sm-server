@@ -11,7 +11,7 @@ def test_admin_add_category(client, authorize_admin):
     headers = authorize_admin
     expected_result = {
         "id": 1,
-        "name": "Furniture",
+        "name": "furniture",
         "description": "this is the furniture category"
     }
 
@@ -27,7 +27,7 @@ def test_admin_get_category(client, authorize_admin):
     headers = authorize_admin
     expected_result = {
         "id": 1,
-        "name": "Furniture",
+        "name": "furniture",
         "description": "this is the furniture category"
     }
 
@@ -40,9 +40,12 @@ def test_admin_get_category(client, authorize_admin):
 def test_admin_get_categories(client, authorize_admin):
     """admin should be able to get all categories"""
     headers = authorize_admin
-    client.post('/api/v2/categories', data=json.dumps(CATEGORIES['category2']), headers=headers)
-    client.post('/api/v2/categories', data=json.dumps(CATEGORIES['category3']), headers=headers)
-    client.post('/api/v2/categories', data=json.dumps(CATEGORIES['category4']), headers=headers)
+    response = client.post('/api/v2/categories', data=json.dumps(CATEGORIES['category2']), headers=headers)
+    assert response.status_code == 201
+    response = client.post('/api/v2/categories', data=json.dumps(CATEGORIES['category3']), headers=headers)
+    assert response.status_code == 201
+    response = client.post('/api/v2/categories', data=json.dumps(CATEGORIES['category4']), headers=headers)
+    assert response.status_code == 201
 
     response = client.get('/api/v2/categories', headers=headers)
     data = response.json
@@ -55,11 +58,6 @@ def test_admin_update_category(client, authorize_admin):
     """admin should be able to get a category"""
     headers = authorize_admin
     expected_message = 'category updated successfully'
-    # expected_result = {
-    #     "id": 2,
-    #     "name": "Electronics",
-    #     "description": "this is the updated electronics category"
-    # }
 
     response = client.put('/api/v2/categories/2', data=json.dumps(UPDATED_CATEGORY),
                           headers=headers)
@@ -71,21 +69,9 @@ def test_admin_update_category(client, authorize_admin):
 def test_admin_delete_category(client, authorize_admin):
     """admin should be able to get all categories"""
     headers = authorize_admin
-    # expected_result = {
-    #     'id': 1,
-    #     'name': 'Table',
-    #     'price': 10000,
-    #     'description': 'a cool table',
-    #     'category': 'furniture',
-    #     'stock': 100,
-    #     'min_stock': 10
-    # }
 
     response = client.delete('/api/v2/categories/{:d}'.format(3), headers=headers)
-
-    # data = response.json
     assert response.status_code == 200
-    # assert data['category'] == expected_result
 
 
 def test_admin_get_products_empty(client, authorize_admin):
@@ -104,10 +90,10 @@ def test_admin_add_product(client, authorize_admin):
     headers = authorize_admin
     expected_result = {
         'id': 1,
-        'name': 'Table',
+        'name': 'table',
         'price': 10000,
         'description': 'a cool table',
-        'category': 'Furniture',
+        'category': 'furniture',
         'stock': 100,
         'min_stock': 10
     }
@@ -122,10 +108,12 @@ def test_admin_add_product(client, authorize_admin):
 def test_admin_get_all_products(client, authorize_admin):
     """admin should be able to get all products"""
     headers = authorize_admin
-    client.post('/api/v2/products', data=json.dumps(PRODUCTS['product2']), headers=headers)
+    response = client.post('/api/v2/products', data=json.dumps(PRODUCTS['product2']), headers=headers)
+    assert response.status_code == 201
     client.post('/api/v2/products', data=json.dumps(PRODUCTS['product3']), headers=headers)
-    client.post('/api/v2/products', data=json.dumps(PRODUCTS['product4']), headers=headers)
-
+    assert response.status_code == 201
+    response = client.post('/api/v2/products', data=json.dumps(PRODUCTS['product4']), headers=headers)
+    assert response.status_code == 201
     response = client.get('/api/v2/products', headers=headers)
     data = response.json
     products = data['products']
@@ -133,16 +121,15 @@ def test_admin_get_all_products(client, authorize_admin):
     assert response.status_code == 200
     assert len(products) == 4
 
-
 def test_admin_get_one_product(client, authorize_admin):
     """admin should be able to get a single product"""
     headers = authorize_admin
     expected_result = {
         'id': 3,
-        'name': 'Television',
+        'name': 'television',
         'price': 30000,
         'description': 'a cool television',
-        'category': 'Electronics',
+        'category': 'electronics',
         'stock': 200,
         'min_stock': 20
     }
@@ -233,10 +220,10 @@ def test_attendant_get_one_product(client, authorize_attendant):
     headers = authorize_attendant
     expected_result = {
         'id': 3,
-        'name': 'Television',
+        'name': 'television',
         'description': 'a cool television',
         'price': 30000,
-        'category': 'Electronics',
+        'category': 'electronics',
         'stock': 200,
         'min_stock': 20
     }
@@ -290,19 +277,19 @@ def test_attendant_get_single_sale(client, authorize_attendant):
         "id": 2,
         "products": {
             "1": {
-                "name": "Table",
+                "name": "table",
                 "price": 10000,
                 "quantity": 2,
                 "cost": 20000
             },
             "2": {
-                "name": "Phone",
+                "name": "phone",
                 "price": 20000,
                 "quantity": 2,
                 "cost": 40000
             },
             "3": {
-                "name": "Couch",
+                "name": "couch",
                 "price": 50000,
                 "quantity": 10,
                 "cost": 500000
@@ -338,19 +325,19 @@ def test_admin_get_single_sale(client, authorize_admin):
         "id": 2,
         "products": {
             "1": {
-                "name": "Table",
+                "name": "table",
                 "price": 10000,
                 "quantity": 2,
                 "cost": 20000
             },
             "2": {
-                "name": "Phone",
+                "name": "phone",
                 "price": 20000,
                 "quantity": 2,
                 "cost": 40000
             },
             "3": {
-                "name": "Couch",
+                "name": "couch",
                 "price": 50000,
                 "quantity": 10,
                 "cost": 500000
