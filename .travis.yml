@@ -14,7 +14,6 @@ before_script:
 - psql -c 'create database STORE_DB;' -U postgres
 script:
 - pytest --cov=storemanager/api/v2
-- bundle exec rspec
 
 after_success:
 - coveralls
