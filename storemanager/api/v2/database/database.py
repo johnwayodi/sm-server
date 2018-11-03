@@ -1,9 +1,7 @@
 import os
 import psycopg2
 from storemanager.api.v2.database.config import config
-from flask import current_app
-from .queries import CREATE_TABLE_USERS, CREATE_TABLE_PRODUCTS, CREATE_TABLE_CATEGORIES, \
-    CREATE_TABLE_SALES, CREATE_TABLE_SALE_ITEMS, DROP_ALL_TABLES
+from .queries import *
 
 
 class Database:
@@ -28,9 +26,9 @@ class Database:
         conn = None
         for statement in create_tables_query:
             try:
-                # params = config()
-                # conn = psycopg2.connect(**params)
-                conn = DB.connect()
+                params = config()
+                conn = psycopg2.connect(**params)
+                # conn = DB.connect()
                 cur = conn.cursor()
                 cur.execute(statement)
                 conn.commit()
@@ -46,9 +44,9 @@ class Database:
         print('Dropping Tables')
         conn = None
         try:
-            # params = config()
-            # conn = psycopg2.connect(**params)
-            conn = DB.connect()
+            params = config()
+            conn = psycopg2.connect(**params)
+            # conn = DB.connect()
             cur = conn.cursor()
             cur.execute(DROP_ALL_TABLES)
             conn.commit()

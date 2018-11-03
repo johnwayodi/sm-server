@@ -1,6 +1,9 @@
 from flask import Blueprint
 from flask_restful import Api
-from storemanager.api.v2.views import *
+from storemanager.api.v2.views.category_views import Category, Categories
+from storemanager.api.v2.views.product_views import Product, ProductList
+from storemanager.api.v2.views.sale_views import SaleRecord, SaleRecords
+from storemanager.api.v2.views.user_views import *
 
 api_blueprint = Blueprint("api", __name__, url_prefix="/api/v2")
 auth_blueprint = Blueprint("auth", __name__, url_prefix="/auth")

@@ -63,6 +63,18 @@ CATEGORIES = {
     "category4": {
         "name": "Accessories",
         "description": "this is the Accessories category"
+    },
+    "category5": {
+        "name": "12345",
+        "description": "this is the electronics category"
+    },
+    "category6": {
+        "name": " ",
+        "description": "this is the electronics category"
+    },
+    "category7": {
+        "name": "Home",
+        "description": "123456"
     }
 }
 
@@ -73,32 +85,72 @@ UPDATED_CATEGORY = {
 
 SALE_RECORDS = {
     "sale1": {
-        "products": {
-            "1": {
+        "products": [
+            {
                 "name": "Table",
                 "count": 2
             },
-            "2": {
+            {
                 "name": "Television",
                 "count": 10
             }
-        }
+        ]
     },
     "sale2": {
-        "products": {
-            "1": {
+        "products": [
+            {
                 "name": "Table",
                 "count": 2
             },
-            "2": {
+            {
                 'name': 'Phone',
                 "count": 2
             },
-            "3": {
+            {
                 'name': 'Couch',
                 "count": 10
             }
-        }
+        ]
+    },
+    "sale3": {
+        "products": [
+            {
+                "name": "Table",
+                "count": -2
+            }
+        ]
+    },
+    "sale4": {
+        "products": [
+            {
+                "name": "Table",
+                "count": 0
+            }
+        ]
+    },
+    "sale5": {
+        "products": [
+            {
+                "name": "Chocolate",
+                "count": 10
+            }
+        ]
+    },
+    "sale6": {
+        "products": [
+            {
+                "name": "1234",
+                "count": 10
+            }
+        ]
+    },
+    "sale7": {
+        "products": [
+            {
+                "name": "Table",
+                "count": 100000
+            }
+        ]
     }
 }
 
