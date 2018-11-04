@@ -8,9 +8,10 @@
 Store Manager is a web application for use in a single store. There are two users: Administrator and Attendant.
 
 The Administrator is the Store Owner and can add Store Attendants to the application. The Store Owner can also add, 
-modify and delete products.
+modify and delete products. The Store Owner will also be able to view all Sale Records created by the different Store Attendants.
 
-The Store Attendant will be able to sell products and create Sale Records. 
+The Store Attendant will be able to sell products and create Sale Records. The Attendant will also be able to view 
+all his/her sale individual sale records.
 
 The Front-End design of the application can be viewed here: [Store Manager UI](https://johnwayodi.github.io/store-manager/)
 

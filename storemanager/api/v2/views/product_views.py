@@ -1,14 +1,13 @@
-from flask import request
+from flask import request, abort
 from flask_expects_json import expects_json
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import jwt_required
 from flask_restful import Resource
 
 from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.models.category import CategoryModel
 from storemanager.api.v2.models.product import ProductModel
-from storemanager.api.v2.models.user import UserModel
 from storemanager.api.v2.utils.validators import CustomValidator
-from storemanager.api.v2.utils.check_role import check_user_identity
+from storemanager.api.v2.utils.check_role import check_user_admin
 
 PRODUCT_SCHEMA = {
     'type': 'object',
@@ -103,10 +102,9 @@ class Product(Resource):
          404:
            description: Product with specified id does not exist.
             """
-        if check_user_identity() != "admin":
-            return {'message': 'only administrator can delete a product'}, 403
+        check_user_admin()
         if not product_id.isdigit():
-            return {'message': 'provided id is not an integer'}, 400
+            abort(400, 'provided id is not an integer')
         data = request.get_json()
         name = data['name']
         description = data['description']
@@ -136,8 +134,7 @@ class Product(Resource):
 
     @jwt_required
     def delete(self, product_id):
-        if check_user_identity() != "admin":
-            return {'message': 'only administrator can delete a product'}, 403
+        check_user_admin()
         if not product_id.isdigit():
             return {'message': 'provided id is not an integer'}, 400
         result = ProductModel.get_by_id(GET_PRODUCT, (product_id,))
@@ -246,53 +243,51 @@ class ProductList(Resource):
              400:
                description: Handles all Validation Errors
             """
-        if check_user_identity() == "admin":
-            data = request.get_json()
-            product_name = data['name']
-            product_price = data['price']
-            product_description = data['description']
-            product_category = data['category']
-            product_stock = data['stock']
-            product_min_stock = data['min_stock']
+        check_user_admin()
+        data = request.get_json()
+        product_name = data['name']
+        product_price = data['price']
+        product_description = data['description']
+        product_category = data['category']
+        product_stock = data['stock']
+        product_min_stock = data['min_stock']
 
-            p_name = product_name.lower().strip()
-            p_cat = product_category.lower().strip()
+        p_name = product_name.lower().strip()
+        p_cat = product_category.lower().strip()
 
-            CustomValidator.validate_product_details(
-                p_name, product_price, product_description,
-                p_cat, product_stock, product_min_stock
-            )
+        CustomValidator.validate_product_details(
+            p_name, product_price, product_description,
+            p_cat, product_stock, product_min_stock
+        )
 
-            product = ProductModel.get_by_name(
-                GET_PRODUCT_BY_NAME, (p_name,))
-            if product is not None:
-                return {'message': 'product already exists'}, 400
-            category_result = CategoryModel.get_by_name(
-                GET_CATEGORY_BY_NAME, (p_cat,))
-            if category_result is None:
-                return {'message': 'category provided does not exist'}, 400
+        product = ProductModel.get_by_name(
+            GET_PRODUCT_BY_NAME, (p_name,))
+        if product is not None:
+            return {'message': 'product already exists'}, 400
+        category_result = CategoryModel.get_by_name(
+            GET_CATEGORY_BY_NAME, (p_cat,))
+        if category_result is None:
+            return {'message': 'category provided does not exist'}, 400
 
-            category_id = category_result[0]
+        category_id = category_result[0]
 
-            product_values = (p_name, product_price,
-                              product_stock, product_min_stock,
-                              product_description, category_id)
+        product_values = (p_name, product_price,
+                          product_stock, product_min_stock,
+                          product_description, category_id)
 
-            product = ProductModel()
-            result = product.save(CREATE_PRODUCT, product_values)
-            product.id = result[0]
-            product.name = result[1]
-            product.description = result[2]
-            product.price = result[3]
-            product.stock = result[4]
-            product.min_stock = result[5]
+        product = ProductModel()
+        result = product.save(CREATE_PRODUCT, product_values)
+        product.id = result[0]
+        product.name = result[1]
+        product.description = result[2]
+        product.price = result[3]
+        product.stock = result[4]
+        product.min_stock = result[5]
 
-            category_details = CategoryModel.get_by_id(
-                GET_CATEGORY, (result[6],))
-            category_name = category_details[1]
-            product.category = category_name
+        category_details = CategoryModel.get_by_id(
+            GET_CATEGORY, (result[6],))
+        category_name = category_details[1]
+        product.category = category_name
 
-            return {'message': 'product created',
-                    'product': product.as_dict()}, 201
-
-        return {'message': 'only admin can add a product'}, 403
+        return {'message': 'product created',
+                'product': product.as_dict()}, 201

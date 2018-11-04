@@ -6,7 +6,7 @@ from flask_restful import Resource
 from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.models.category import CategoryModel
 from storemanager.api.v2.utils.validators import CustomValidator
-from storemanager.api.v2.utils.check_role import check_user_identity
+from storemanager.api.v2.utils.check_role import check_user_admin
 
 CATEGORY_SCHEMA = {
     'type': 'object',
@@ -41,10 +41,7 @@ class Category(Resource):
            description: Error shown to Attendant trying to delete product
             """
 
-        # current_user = get_jwt_identity()
-        # user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
-        if check_user_identity() != "admin":
-            return {'message': 'only an admin can view categories'}, 401
+        check_user_admin()
         if not category_id.isdigit():
             return {'message': 'provided id is not an integer'}, 400
         result = CategoryModel.get_by_id(GET_CATEGORY, (category_id,))
@@ -60,10 +57,7 @@ class Category(Resource):
 
     @jwt_required
     def put(self, category_id):
-        # current_user = get_jwt_identity()
-        # user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
-        if check_user_identity() != "admin":
-            return {'message': 'only an admin can update a category'}, 401
+        check_user_admin()
         if not category_id.isdigit():
             return {'message': 'provided id is not an integer'}, 400
         data = request.get_json()
@@ -80,13 +74,9 @@ class Category(Resource):
                         (c_name, description, category.id))
         return {'message': 'category updated successfully'}, 200
 
-
     @jwt_required
     def delete(self, category_id):
-        # current_user = get_jwt_identity()
-        # user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
-        if check_user_identity() != "admin":
-            return {'message': 'only an admin can delete a category'}, 401
+        check_user_admin()
         if not category_id.isdigit():
             return {'message': 'provided id is not an integer'}, 400
 
@@ -105,46 +95,40 @@ class Categories(Resource):
 
     @jwt_required
     def get(self):
-        # current_user = get_jwt_identity()
-        # user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
-        if check_user_identity() == "admin":
-            categories = {}
-            result = CategoryModel.get_all(GET_ALL_CATEGORIES)
+        check_user_admin()
+        categories = {}
+        result = CategoryModel.get_all(GET_ALL_CATEGORIES)
 
-            for i in range(len(result)):
-                category = CategoryModel()
-                category.id = result[i][0]
-                category.name = result[i][1]
-                category.description = result[i][2]
-                categories[i + 1] = category.as_dict()
-            if categories == {}:
-                return {'message': 'no categories added yet'}, 404
-            return {'categories': categories}, 200
-        return {'message': 'only an admin can view categories'}, 401
+        for i in range(len(result)):
+            category = CategoryModel()
+            category.id = result[i][0]
+            category.name = result[i][1]
+            category.description = result[i][2]
+            categories[i + 1] = category.as_dict()
+        if categories == {}:
+            return {'message': 'no categories added yet'}, 404
+        return {'categories': categories}, 200
 
     @jwt_required
     @expects_json(CATEGORY_SCHEMA)
     def post(self):
-        # current_user = get_jwt_identity()
-        # user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
-        if check_user_identity() == "admin":
-            data = request.get_json()
-            category_name = data['name']
-            description = data['description']
+        check_user_admin()
+        data = request.get_json()
+        category_name = data['name']
+        description = data['description']
 
-            c_name = category_name.lower().strip()
-            CustomValidator.validate_category_details(c_name, description)
+        c_name = category_name.lower().strip()
+        CustomValidator.validate_category_details(c_name, description)
 
-            category = CategoryModel.get_by_name(
-                GET_CATEGORY_BY_NAME, (c_name,))
-            if category is not None:
-                abort(400, 'category already exists')
-            category = CategoryModel()
-            result = category.save(CREATE_CATEGORY, (c_name, description))
+        category = CategoryModel.get_by_name(
+            GET_CATEGORY_BY_NAME, (c_name,))
+        if category is not None:
+            abort(400, 'category already exists')
+        category = CategoryModel()
+        result = category.save(CREATE_CATEGORY, (c_name, description))
 
-            category.id = result[0]
-            category.name = result[1]
-            category.description = result[2]
-            return {'message': 'category created',
-                    'category': category.as_dict()}, 201
-        return {'message': 'only an admin can add a category'}, 401
+        category.id = result[0]
+        category.name = result[1]
+        category.description = result[2]
+        return {'message': 'category created',
+                'category': category.as_dict()}, 201

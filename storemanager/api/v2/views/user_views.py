@@ -6,7 +6,7 @@ from flask_restful import Resource
 from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.models.user import UserModel
 from storemanager.api.v2.utils.validators import CustomValidator
-from storemanager.api.v2.utils.check_role import check_user_identity
+from storemanager.api.v2.utils.check_role import check_user_admin
 
 USER_REGISTRATION_SCHEMA = {
     'type': 'object',
@@ -51,8 +51,7 @@ class User(Resource):
          403:
            description: Error shown to Attendant trying to delete product
             """
-        if check_user_identity() != "admin":
-            abort(401, 'only admin can view a user account')
+        check_user_admin()
         if u_id.isdigit():
             user_details = UserModel.get_by_id(GET_USER, (u_id,))
             if user_details is None:
@@ -91,8 +90,7 @@ class User(Resource):
          403:
            description: Error for Attendant trying to delete product
             """
-        if check_user_identity() != "admin":
-            abort(401, 'only admin can delete a user')
+        check_user_admin()
         if not u_id.isdigit():
             abort(400, 'user id must be integer')
         result = UserModel.get_by_id(GET_USER, (u_id,))
@@ -116,22 +114,20 @@ class UserList(Resource):
          200:
            description: List of Users Returned Successful
             """
-        if check_user_identity() == "admin":
-            users = {}
-            result = UserModel.get_all(GET_ALL_USERS)
+        check_user_admin()
+        users = {}
+        result = UserModel.get_all(GET_ALL_USERS)
 
-            for i in range(len(result)):
-                user = UserModel()
-                user.id = result[i][0]
-                user.username = result[i][1]
-                user.role = result[i][2]
-                users[i + 1] = user.as_dict()
-            if users == {}:
-                return {'message': 'no users in system yet'}, 404
+        for i in range(len(result)):
+            user = UserModel()
+            user.id = result[i][0]
+            user.username = result[i][1]
+            user.role = result[i][2]
+            users[i + 1] = user.as_dict()
+        if users == {}:
+            return {'message': 'no users in system yet'}, 404
 
-            return {'users': users}, 200
-
-        return {'message': 'only admin can view users of the system'}, 401
+        return {'users': users}, 200
 
     @jwt_required
     def post(self):
@@ -142,8 +138,7 @@ class UserList(Resource):
          200:
            description: List of Users Returned Successful
             """
-        if check_user_identity() != "admin":
-            abort(401, 'only admin can add users to the system')
+        check_user_admin()
         data = request.get_json()
         username = data['username']
         password = data['password']

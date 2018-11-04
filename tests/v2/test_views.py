@@ -500,7 +500,7 @@ def test_admin_get_one_sale_empty(client, authorize_admin):
 def test_attendant_get_users(client, authorize_attendant):
     """attendant should not be able to get all users of system"""
     headers = authorize_attendant
-    expected_message = 'only admin can view users of the system'
+    expected_message = 'action failed, user is not administrator'
     response = client.get('/api/v2/users', headers=headers)
     data = response.get_json()
     assert response.status_code == 401
@@ -510,7 +510,7 @@ def test_attendant_get_users(client, authorize_attendant):
 def test_attendant_add_attendant(client, authorize_attendant):
     """attendant should not be able to create an attendant account"""
     headers = authorize_attendant
-    expected_result = 'only admin can add users to the system'
+    expected_result = 'action failed, user is not administrator'
 
     username = USERS['user4']['username']
     password = USERS['user4']['password']
@@ -529,7 +529,7 @@ def test_attendant_add_attendant(client, authorize_attendant):
 def test_attendant_get_attendant(client, authorize_attendant):
     """attendant should not be able to create an attendant account"""
     headers = authorize_attendant
-    expected_message = 'only admin can view a user account'
+    expected_message = 'action failed, user is not administrator'
 
     response = client.get('/api/v2/users/{:d}'.format(3), headers=headers)
     data = response.get_json()
@@ -540,7 +540,7 @@ def test_attendant_get_attendant(client, authorize_attendant):
 def test_attendant_delete_attendant(client, authorize_attendant):
     """attendant should not be able to delete another attendant"""
     headers = authorize_attendant
-    expected_message = 'only admin can delete a user'
+    expected_message = 'action failed, user is not administrator'
 
     response = client.delete('/api/v2/users/{:d}'.format(3), headers=headers)
     data = response.get_json()
@@ -551,7 +551,7 @@ def test_attendant_delete_attendant(client, authorize_attendant):
 def test_attendant_add_category(client, authorize_attendant):
     """attendant should not be able to add category"""
     headers = authorize_attendant
-    expected_message = 'only an admin can add a category'
+    expected_message = 'action failed, user is not administrator'
 
     response = client.post('/api/v2/categories',
                            data=json.dumps(CATEGORIES['category1']), headers=headers)
@@ -563,7 +563,7 @@ def test_attendant_add_category(client, authorize_attendant):
 def test_attendant_get_category(client, authorize_attendant):
     """attendant should not be able to get a category"""
     headers = authorize_attendant
-    expected_message = 'only an admin can view categories'
+    expected_message = 'action failed, user is not administrator'
 
     response = client.get('/api/v2/categories/{:d}'.format(1), headers=headers)
     data = response.json
@@ -575,7 +575,7 @@ def test_attendant_get_categories(client, authorize_attendant):
     """attendant should not be able to get all categories"""
     headers = authorize_attendant
 
-    expected_message = 'only an admin can view categories'
+    expected_message = 'action failed, user is not administrator'
     response = client.get('/api/v2/categories', headers=headers)
     data = response.json
 
@@ -586,7 +586,7 @@ def test_attendant_get_categories(client, authorize_attendant):
 def test_attendant_update_category(client, authorize_attendant):
     """attendant should not be able to get a category"""
     headers = authorize_attendant
-    expected_message = 'only an admin can update a category'
+    expected_message = 'action failed, user is not administrator'
 
     response = client.put('/api/v2/categories/2', data=json.dumps(UPDATED_CATEGORY),
                           headers=headers)
@@ -598,7 +598,7 @@ def test_attendant_update_category(client, authorize_attendant):
 def test_attendant_delete_category(client, authorize_attendant):
     """attendant should not be able to delete a category"""
     headers = authorize_attendant
-    expected_message = 'only an admin can delete a category'
+    expected_message = 'action failed, user is not administrator'
     response = client.delete('/api/v2/categories/{:d}'.format(3), headers=headers)
     data = response.get_json()
     assert response.status_code == 401
@@ -608,13 +608,13 @@ def test_attendant_delete_category(client, authorize_attendant):
 def test_attendant_add_product(client, authorize_attendant):
     """attendant should not be able to add new product"""
     headers = authorize_attendant
-    expected_message = 'only admin can add a product'
+    expected_message = 'action failed, user is not administrator'
 
     response = client.post('/api/v2/products',
                            data=json.dumps(PRODUCTS['product1']), headers=headers)
     data = response.json
 
-    assert response.status_code == 403
+    assert response.status_code == 401
     assert data['message'] == expected_message
 
 
@@ -653,12 +653,12 @@ def test_attendant_get_one_product(client, authorize_attendant):
 def test_attendant_remove_product(client, authorize_attendant):
     """attendant should not be able to remove a product"""
     headers = authorize_attendant
-    expected_message = 'only administrator can delete a product'
+    expected_message = 'action failed, user is not administrator'
 
     response = client.delete('/api/v2/products/{:d}'.format(3), headers=headers)
     data = response.json
 
-    assert response.status_code == 403
+    assert response.status_code == 401
     assert data['message'] == expected_message
 
 
