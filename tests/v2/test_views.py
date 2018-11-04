@@ -6,6 +6,121 @@ import json
 from tests.v2.sample_data import *
 
 
+def test_admin_add_attendant(client, authorize_admin):
+    """admin should be able to create an attendant account"""
+    headers = authorize_admin
+    expected_result = 'attendant created successfully'
+
+    username = USERS['user4']['username']
+    password = USERS['user4']['password']
+
+    credentials = {
+        'username': username,
+        'password': password
+    }
+
+    response = client.post('/api/v2/users', data=json.dumps(credentials), headers=headers)
+    data = response.get_json()
+    assert response.status_code == 201
+    assert data['message'] == expected_result
+
+
+def test_admin_add_attendant_exists(client, authorize_admin):
+    """admin should not be able to create same attendant account"""
+    headers = authorize_admin
+    expected_result = 'attendant with similar name exists'
+
+    username = USERS['user4']['username']
+    password = USERS['user4']['password']
+
+    credentials = {
+        'username': username,
+        'password': password
+    }
+
+    response = client.post('/api/v2/users', data=json.dumps(credentials), headers=headers)
+    data = response.get_json()
+    assert response.status_code == 400
+    assert data['message'] == expected_result
+
+
+def test_admin_get_attendant(client, authorize_admin):
+    """admin should be able to view an attendant account"""
+    headers = authorize_admin
+    expected_result = {
+        "id": 3,
+        "username": "walulu",
+        "role": "attendant"
+    }
+
+    response = client.get('/api/v2/users/{:d}'.format(3), headers=headers)
+    data = response.get_json()
+    assert response.status_code == 200
+    assert data['user'] == expected_result
+
+
+def test_admin_get_attendant_not_exist(client, authorize_admin):
+    """admin should be able to view an attendant account"""
+    headers = authorize_admin
+    expected_message = 'user with id does not exist'
+
+    response = client.get('/api/v2/users/{:d}'.format(20), headers=headers)
+    data = response.get_json()
+    assert response.status_code == 404
+    assert data['message'] == expected_message
+
+
+def test_admin_get_attendant_non_integer(client, authorize_admin):
+    """admin should be able to pass a non integer value in url"""
+    headers = authorize_admin
+    expected_message = 'user id must be integer'
+
+    response = client.get('/api/v2/users/a', headers=headers)
+    data = response.get_json()
+    assert response.status_code == 400
+    assert data['message'] == expected_message
+
+
+def test_admin_get_users(client, authorize_admin):
+    """admin should be able to get all users of system"""
+    headers = authorize_admin
+    response = client.get('/api/v2/users', headers=headers)
+    assert response.status_code == 200
+
+
+def test_admin_delete_attendant_non_integer(client, authorize_admin):
+    """admin should be able to pass a non integer value in url"""
+    headers = authorize_admin
+    expected_message = 'user id must be integer'
+
+    response = client.delete('/api/v2/users/a', headers=headers)
+    data = response.get_json()
+    assert response.status_code == 400
+    assert data['message'] == expected_message
+
+
+def test_admin_delete_attendant_non_existent(client, authorize_admin):
+    """admin should be able to delete a non existent attendant"""
+    headers = authorize_admin
+    expected_message = 'user with id does not exist'
+
+    response = client.delete('/api/v2/users/{:d}'.format(6), headers=headers)
+    data = response.get_json()
+    assert response.status_code == 404
+    assert data['message'] == expected_message
+
+
+def test_admin_delete_attendant(client, authorize_admin):
+    """admin should be able to delete a non existent attendant"""
+    headers = authorize_admin
+    expected_message = 'user deleted successfully'
+
+    response = client.delete('/api/v2/users/{:d}'.format(3), headers=headers)
+    data = response.get_json()
+    assert response.status_code == 200
+    assert data['message'] == expected_message
+
+
 def test_admin_add_category_empty(client, authorize_admin):
     """admin should be able to get empty category list message"""
     headers = authorize_admin
@@ -164,6 +279,105 @@ def test_admin_add_product(client, authorize_admin):
     assert data['product'] == expected_result
 
 
+def test_admin_add_product_name_integer(client, authorize_admin):
+    """admin should not be able to add product with name number"""
+    headers = authorize_admin
+    expected_message = 'name cannot be an integer value'
+    response = client.post('/api/v2/products',
+                           data=json.dumps(PRODUCTS['product6']), headers=headers)
+    data = response.json
+    assert response.status_code == 400
+    assert data['message'] == expected_message
+
+
+def test_admin_add_product_name_empty(client, authorize_admin):
+    """admin should not be able to add product with empty name"""
+    headers = authorize_admin
+    expected_message = 'name should not be empty'
+    response = client.post('/api/v2/products',
+                           data=json.dumps(PRODUCTS['product7']), headers=headers)
+    data = response.json
+    assert response.status_code == 400
+    assert data['message'] == expected_message
+
+
+def test_admin_add_product_price_negative(client, authorize_admin):
+    """admin should not be able to add product with negative price"""
+    headers = authorize_admin
+    expected_message = 'price cannot be a negative or 0'
+    response = client.post('/api/v2/products',
+                           data=json.dumps(PRODUCTS['product8']), headers=headers)
+    data = response.json
+    assert response.status_code == 400
+    assert data['message'] == expected_message
+
+
+def test_admin_add_product_description_numbered(client, authorize_admin):
+    """admin should not be able to add product with numbered description"""
+    headers = authorize_admin
+    expected_message = 'description cannot be an integer value'
+    response = client.post('/api/v2/products',
+                           data=json.dumps(PRODUCTS['product9']), headers=headers)
+    data = response.json
+    assert response.status_code == 400
+    assert data['message'] == expected_message
+
+
+def test_admin_add_product_description_empty(client, authorize_admin):
+    """admin should not be able to add product with empty description"""
+    headers = authorize_admin
+    expected_message = 'description should not be empty'
+    response = client.post('/api/v2/products',
+                           data=json.dumps(PRODUCTS['product11']), headers=headers)
+    data = response.json
+    assert response.status_code == 400
+    assert data['message'] == expected_message
+
+
+def test_admin_add_product_category_numbered(client, authorize_admin):
+    """admin should not be able to add product with numbered description"""
+    headers = authorize_admin
+    expected_message = 'category cannot be an integer value'
+    response = client.post('/api/v2/products',
+                           data=json.dumps(PRODUCTS['product10']), headers=headers)
+    data = response.json
+    assert response.status_code == 400
+    assert data['message'] == expected_message
+
+
+def test_admin_add_product_category_empty(client, authorize_admin):
+    """admin should not be able to add product with empty description"""
+    headers = authorize_admin
+    expected_message = 'category should not be empty'
+    response = client.post('/api/v2/products',
+                           data=json.dumps(PRODUCTS['product12']), headers=headers)
+    data = response.json
+    assert response.status_code == 400
+    assert data['message'] == expected_message
+
+
+def test_admin_add_product_stock_negative(client, authorize_admin):
+    """admin should not be able to add product with negative stock"""
+    headers = authorize_admin
+    expected_message = 'stock cannot be a negative or 0'
+    response = client.post('/api/v2/products',
+                           data=json.dumps(PRODUCTS['product13']), headers=headers)
+    data = response.json
+    assert response.status_code == 400
+    assert data['message'] == expected_message
+
+
+def test_admin_add_product_minstock_negative(client, authorize_admin):
+    """admin should not be able to add product with negative minimum stock"""
+    headers = authorize_admin
+    expected_message = 'minimum cannot be a negative or 0'
+    response = client.post('/api/v2/products',
+                           data=json.dumps(PRODUCTS['product14']), headers=headers)
+    data = response.json
+    assert response.status_code == 400
+    assert data['message'] == expected_message
+
+
 def test_admin_get_all_products(client, authorize_admin):
     """admin should be able to get all products"""
     headers = authorize_admin
@@ -199,6 +413,39 @@ def test_admin_get_one_product(client, authorize_admin):
 
     assert response.status_code == 200
     assert data['product'] == expected_result
+
+
+def test_admin_update_product(client, authorize_admin):
+    """admin should be able to get a single product"""
+    headers = authorize_admin
+    expected_message = 'product updated successfully'
+
+    response = client.put('/api/v2/products/{:d}'.format(3), data=json.dumps(PRODUCTS['product15']), headers=headers)
+    data = response.json
+    assert response.status_code == 200
+    assert data['message'] == expected_message
+
+
+def test_admin_update_product_non_exist(client, authorize_admin):
+    """admin should not be able to update a non existent product"""
+    headers = authorize_admin
+    expected_message = 'product with id does not exist'
+
+    response = client.put('/api/v2/products/{:d}'.format(10), data=json.dumps(PRODUCTS['product15']), headers=headers)
+    data = response.json
+    assert response.status_code == 404
+    assert data['message'] == expected_message
+
+
+def test_admin_update_product_category_non_exist(client, authorize_admin):
+    """admin should not be able to update a product with non existing category"""
+    headers = authorize_admin
+    expected_message = 'category provided does not exist'
+
+    response = client.put('/api/v2/products/{:d}'.format(5), data=json.dumps(PRODUCTS['product16']), headers=headers)
+    data = response.json
+    assert response.status_code == 404
+    assert data['message'] == expected_message
 
 
 def test_admin_remove_product(client, authorize_admin):
@@ -247,6 +494,57 @@ def test_admin_get_one_sale_empty(client, authorize_admin):
     data = response.json
 
     assert response.status_code == 404
+    assert data['message'] == expected_message
+
+
+def test_attendant_get_users(client, authorize_attendant):
+    """attendant should not be able to get all users of system"""
+    headers = authorize_attendant
+    expected_message = 'only admin can view users of the system'
+    response = client.get('/api/v2/users', headers=headers)
+    data = response.get_json()
+    assert response.status_code == 401
+    assert data['message'] == expected_message
+
+
+def test_attendant_add_attendant(client, authorize_attendant):
+    """attendant should not be able to create an attendant account"""
+    headers = authorize_attendant
+    expected_result = 'only admin can add users to the system'
+
+    username = USERS['user4']['username']
+    password = USERS['user4']['password']
+
+    credentials = {
+        'username': username,
+        'password': password
+    }
+
+    response = client.post('/api/v2/users', data=json.dumps(credentials), headers=headers)
+    data = response.get_json()
+    assert response.status_code == 401
+    assert data['message'] == expected_result
+
+
+def test_attendant_get_attendant(client, authorize_attendant):
+    """attendant should not be able to create an attendant account"""
+    headers = authorize_attendant
+    expected_message = 'only admin can view a user account'
+
+    response = client.get('/api/v2/users/{:d}'.format(3), headers=headers)
+    data = response.get_json()
+    assert response.status_code == 401
+    assert data['message'] == expected_message
+
+
+def test_attendant_delete_attendant(client, authorize_attendant):
+    """attendant should not be able to delete another attendant"""
+    headers = authorize_attendant
+    expected_message = 'only admin can delete a user'
+
+    response = client.delete('/api/v2/users/{:d}'.format(3), headers=headers)
+    data = response.get_json()
+    assert response.status_code == 401
     assert data['message'] == expected_message
 
 
@@ -338,7 +636,7 @@ def test_attendant_get_one_product(client, authorize_attendant):
     expected_result = {
         'id': 3,
         'name': 'television',
-        'description': 'a cool television',
+        'description': 'a very cool television',
         'price': 30000,
         'category': 'electronics',
         'stock': 200,
@@ -463,7 +761,8 @@ def test_attendant_get_single_sale(client, authorize_attendant):
             }
         },
         "items": 14,
-        "total": 560000
+        "total": 560000,
+        "attendant_id": 4
     }
 
     response = client.get('/api/v2/sales/{:d}'.format(2), headers=headers)
@@ -511,7 +810,8 @@ def test_admin_get_single_sale(client, authorize_admin):
             }
         },
         "items": 14,
-        "total": 560000
+        "total": 560000,
+        "attendant_id": 4
     }
 
     response = client.get('/api/v2/sales/{:d}'.format(2), headers=headers)

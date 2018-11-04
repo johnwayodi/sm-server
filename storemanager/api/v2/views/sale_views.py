@@ -71,7 +71,7 @@ class SaleRecord(Resource):
             sale.id = sale_details[0]
             sale.items = sale_details[1]
             sale.total = sale_details[2]
-
+            sale.attendant = sale_details[3]
             sale_products = SaleRecordModelItem.get_all_by_id(
                 GET_SALE_ITEMS, (sale.id,))
             products = {}
@@ -86,7 +86,8 @@ class SaleRecord(Resource):
             return {'id': sale.id,
                     'products': products,
                     'items': sale.items,
-                    'total': sale.total}, 200
+                    'total': sale.total,
+                    'attendant_id': sale.attendant}, 200
         else:
             return {'message': 'sale id must be integer'}, 400
 
@@ -121,6 +122,7 @@ class SaleRecords(Resource):
             sale.id = result[i][0]
             sale.items = result[i][1]
             sale.total = result[i][2]
+            sale.attendant = result[i][3]
             sales[i + 1] = sale.as_dict()
         if sales == {}:
             return {'message': 'no sales added yet'}, 404
@@ -219,10 +221,13 @@ class SaleRecords(Resource):
                 total_cost += cost
                 items_count += quantity_in_cart
 
+            attendant_id = user_details[0]
+
             sale = SaleRecordModel()
             sale.items = items_count
             sale.total = total_cost
-            result = sale.save(CREATE_SALE, (items_count, total_cost))
+            sale.attendant = attendant_id
+            result = sale.save(CREATE_SALE, (items_count, total_cost, attendant_id))
             sale.id = result[0]
 
             products_in_sale = []

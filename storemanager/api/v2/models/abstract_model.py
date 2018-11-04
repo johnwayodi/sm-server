@@ -3,7 +3,6 @@ This module contains the Generic Model
 UserModel, ProductModel and SaleRecordModel inherit from AbstractModel
 """
 import psycopg2
-from storemanager.api.v2.database.config import config
 from storemanager.api.v2.database.database import DB
 
 conn = None
@@ -99,6 +98,25 @@ class AbstractModel:
             cur = conn.cursor()
             cur.execute(statement)
             result_rows = cur.fetchall()
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+        return result_rows
+
+    @classmethod
+    def get_one(cls, statement):
+        """Returns one row result"""
+        global conn, result_rows
+        try:
+            conn = DB.connect()
+            cur = conn.cursor()
+            cur.execute(statement)
+            result_rows = cur.fetchone()
             conn.commit()
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:

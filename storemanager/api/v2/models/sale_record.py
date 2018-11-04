@@ -1,7 +1,7 @@
 """ This module contains the Sale Record model."""
 import psycopg2
-from storemanager.api.v2.database.config import config
 from .abstract_model import AbstractModel
+from storemanager.api.v2.database.database import DB
 
 
 class SaleRecordModel(AbstractModel):
@@ -12,6 +12,7 @@ class SaleRecordModel(AbstractModel):
         super().__init__()
         self.items = int
         self.total = int
+        self.attendant = int
 
     def save(self, statement, values):
         """Adds a new sale record"""
@@ -25,7 +26,8 @@ class SaleRecordModel(AbstractModel):
         """Converts Sale Record to dict() object."""
         return {'id': self.id,
                 'items': self.items,
-                'total': self.total}
+                'total': self.total,
+                'attendant_id': self.attendant}
 
 
 class SaleRecordModelItem(AbstractModel):
@@ -40,15 +42,11 @@ class SaleRecordModelItem(AbstractModel):
 
     def save(self, statement, values):
         """Adds a new sale item"""
-        # return super().save(statement, values)
         conn = None
-        # result_row = None
         try:
-            params = config()
-            conn = psycopg2.connect(**params)
+            conn = DB.connect()
             cur = conn.cursor()
             cur.executemany(statement, values)
-            # result_row = cur.fetchone()
             conn.commit()
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
@@ -56,7 +54,6 @@ class SaleRecordModelItem(AbstractModel):
         finally:
             if conn is not None:
                 conn.close()
-        # return result_row
 
     def delete(self, statement, value):
         """deletes a sale item"""

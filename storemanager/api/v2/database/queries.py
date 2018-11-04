@@ -33,7 +33,8 @@ CREATE_TABLE_SALES = """
     CREATE TABLE SALE_RECORDS (
     ID SERIAL PRIMARY KEY,
     ITEMS INTEGER NOT NULL,
-    TOTAL INTEGER NOT NULL
+    TOTAL INTEGER NOT NULL,
+    ATTENDANT_ID INTEGER REFERENCES USERS (ID)
     );"""
 
 CREATE_TABLE_SALE_ITEMS = """
@@ -112,18 +113,24 @@ GET_ALL_PRODUCTS = """
     SELECT * FROM products ORDER BY id"""
 
 CREATE_SALE = """
-    INSERT INTO sale_records(items, total)
-    VALUES(%s, %s)
-    RETURNING id, items, total;"""
+    INSERT INTO sale_records(items, total, attendant_id)
+    VALUES(%s, %s, %s)
+    RETURNING id, items, total, attendant_id;"""
 
 GET_SALE = """
-    SELECT id, items, total
+    SELECT id, items, total, attendant_id
     FROM sale_records
     WHERE id = %s"""
 
 GET_ALL_SALES = """
-    SELECT id, items, total
+    SELECT id, items, total, attendant_id
     FROM sale_records
+    ORDER BY id"""
+
+GET_ALL_SALES_BY_ATTENDANT = """
+    SELECT id, items, total, attendant_id
+    FROM sale_records
+    WHERE attendant_id = %s
     ORDER BY id"""
 
 CREATE_SALE_ITEM = """
@@ -165,3 +172,9 @@ GET_ALL_USERS = """
     SELECT id, name, role
     FROM users
     ORDER BY id"""
+
+CHECK_ADMIN_EXISTS= """
+    SELECT 1 
+    FROM USERS 
+    WHERE role LIKE '%admin%' 
+    LIMIT 1;"""
