@@ -77,7 +77,7 @@ The API exposes the following endpoints:
       <tr>
         <td>PUT</td>
         <td>/users/{user_id}</td>
-        <td>Update details of a user account, only accessiblr to the admin</td>
+        <td>Update details of a user account, only accessible to the admin</td>
       </tr>
       <tr>
         <td>DELETE</td>
@@ -87,7 +87,7 @@ The API exposes the following endpoints:
     </table>
 
 2. #### Category Endpoints
-    The `/api/v2/category` endpoint allows all the CRUD operations on the category items.
+    The `/api/v2/categories` endpoint allows all the CRUD operations on the category items.
     <table style="width:100%">
       <tr>
         <td>POST</td>
@@ -117,7 +117,7 @@ The API exposes the following endpoints:
     </table>
 
 3. #### Product Endpoints
-    The `/products` endpoint allows all CRUD operations on product items
+    The `api/v2/products` endpoint allows all CRUD operations on product items
     <table style="width:100%">
       <tr>
         <td>POST</td>
@@ -147,7 +147,7 @@ The API exposes the following endpoints:
     </table>
 
 4. #### Sales Endpoints
-    The `/sales` endpoint allows the following operations on sale items
+    The `api/v2/sales` endpoint allows the following operations on sale items
     <table style="width:100%">
       <tr>
         <td>POST</td>

@@ -175,69 +175,68 @@ class SaleRecords(Resource):
 
         current_user = get_jwt_identity()
         user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
-        if user_details[3] == "attendant":
-            data = request.get_json()
-            total_cost = 0
-            items_count = 0
-            products = []
+        if user_details[3] != "attendant":
+            return {'message': 'only attendants can create a sale record'}, 403
+        data = request.get_json()
+        total_cost = 0
+        items_count = 0
+        products = []
 
-            items = data['products']
+        items = data['products']
 
-            for i in range(len(items)):
-                product_name = items[i]['name']
-                quantity_in_cart = items[i]['count']
+        for i in range(len(items)):
+            product_name = items[i]['name']
+            quantity_in_cart = items[i]['count']
 
-                p_name = product_name.lower().strip()
+            p_name = product_name.lower().strip()
 
-                CustomValidator.validate_sale_items(
-                    p_name, quantity_in_cart)
+            CustomValidator.validate_sale_items(
+                p_name, quantity_in_cart)
 
-                product = ProductModel.get_by_name(
-                    GET_PRODUCT_BY_NAME, (p_name,))
-                if product is None:
-                    return {'message': 'failed to create sale record',
-                            'reason': 'product named {} does '
-                                      'not exist'.format(p_name)}, 400
+            product = ProductModel.get_by_name(
+                GET_PRODUCT_BY_NAME, (p_name,))
+            if product is None:
+                return {'message': 'failed to create sale record',
+                        'reason': 'product named {} does '
+                                  'not exist'.format(p_name)}, 400
 
-                product_price = product[2]
-                cost = product_price * quantity_in_cart
-                if product[3] - quantity_in_cart < product[4]:
-                    return {'message': 'failed to create sale record',
-                            'reason': 'cannot sell past minimum '
-                                      'stock for {}'.format(p_name)}, 400
+            product_price = product[2]
+            cost = product_price * quantity_in_cart
+            if product[3] - quantity_in_cart < product[4]:
+                return {'message': 'failed to create sale record',
+                        'reason': 'cannot sell past minimum '
+                                  'stock for {}'.format(p_name)}, 400
 
-                new_stock_value = product[3] - quantity_in_cart
-                ProductModel.update_on_sale(
-                    UPDATE_PRODUCT_ON_SALE, (new_stock_value, product[0]))
+            new_stock_value = product[3] - quantity_in_cart
+            ProductModel.update_on_sale(
+                UPDATE_PRODUCT_ON_SALE, (new_stock_value, product[0]))
 
-                product_info = (p_name,
-                                product_price,
-                                quantity_in_cart,
-                                cost)
+            product_info = (p_name,
+                            product_price,
+                            quantity_in_cart,
+                            cost)
 
-                products.append(product_info)
+            products.append(product_info)
 
-                total_cost += cost
-                items_count += quantity_in_cart
+            total_cost += cost
+            items_count += quantity_in_cart
 
-            attendant_id = user_details[0]
+        attendant_id = user_details[0]
 
-            sale = SaleRecordModel()
-            sale.items = items_count
-            sale.total = total_cost
-            sale.attendant = attendant_id
-            result = sale.save(CREATE_SALE, (items_count, total_cost, attendant_id))
-            sale.id = result[0]
+        sale = SaleRecordModel()
+        sale.items = items_count
+        sale.total = total_cost
+        sale.attendant = attendant_id
+        result = sale.save(CREATE_SALE, (items_count, total_cost, attendant_id))
+        sale.id = result[0]
 
-            products_in_sale = []
-            for i in range(len(products)):
-                product = products[i]
-                sale_item = product + (sale.id,)
-                tuple(product)
-                products_in_sale.append(sale_item)
-            sale_items = SaleRecordModelItem()
-            sale_items.save(CREATE_SALE_ITEM, products_in_sale)
-            return {'message': 'Sale Record created successfully',
-                    'sale': sale.as_dict()}, 201
-
-        return {'message': 'only attendants can create a sale record'}, 403
+        products_in_sale = []
+        for i in range(len(products)):
+            product = products[i]
+            sale_item = product + (sale.id,)
+            tuple(product)
+            products_in_sale.append(sale_item)
+        sale_items = SaleRecordModelItem()
+        sale_items.save(CREATE_SALE_ITEM, products_in_sale)
+        return {'message': 'Sale Record created successfully',
+                'sale': sale.as_dict()}, 201
