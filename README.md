@@ -56,8 +56,28 @@ The API exposes the following endpoints:
       </tr>
     </table>
 
+2. #### User Endpoints
+    The `/api/v2/users` endpoint allows the management of attendants by the admin, the admin can add, update or remove an attendant accounts 
+    <table style="width:100%">
+      <tr>
+        <td>POST</td>
+        <td>/users</td>
+        <td>Create a new attendant, only accessible to admin</td>
+      </tr>
+      <tr>
+        <td>PUT</td>
+        <td>/users/{user_id}</td>
+        <td>Update details of a user account, only accessiblr to the admin</td>
+      </tr>
+      <tr>
+        <td>DELETE</td>
+        <td>/users/{user_id}</td>
+        <td>Remove a user account, only accessible to the admin</td>
+      </tr>
+    </table>
+
 2. #### Category Endpoints
-    The `/category` endpoint allows all the CRUD operations on the category items.
+    The `/api/v2/category` endpoint allows all the CRUD operations on the category items.
     <table style="width:100%">
       <tr>
         <td>POST</td>
