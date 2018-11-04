@@ -1,12 +1,11 @@
 from flask import request, abort
 from flask_expects_json import expects_json
-from flask_jwt_extended import jwt_required, create_access_token, \
-    get_jwt_identity
+from flask_jwt_extended import jwt_required, create_access_token
 from flask_restful import Resource
 
 from storemanager.api.v2.database.queries import *
-from storemanager.api.v2.models.user import UserModel
 from storemanager.api.v2.utils.validators import CustomValidator
+from storemanager.api.v2.utils.custom_checks import *
 
 USER_REGISTRATION_SCHEMA = {
     'type': 'object',
@@ -51,22 +50,17 @@ class User(Resource):
          403:
            description: Error shown to Attendant trying to delete product
             """
-        current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
-        if user_details[3] != "admin":
-            abort(401, 'only admin can view a user account')
-        if u_id.isdigit():
-            user_details = UserModel.get_by_id(GET_USER, (u_id,))
-            if user_details is None:
-                return {'message': 'user with id does not exist'}, 404
+        check_user_admin()
+        check_id_integer(u_id)
+        user_details = UserModel.get_by_id(GET_USER, (u_id,))
+        if user_details is None:
+            return {'message': 'user with id does not exist'}, 404
 
-            user = UserModel()
-            user.id = user_details[0]
-            user.username = user_details[1]
-            user.role = user_details[2]
-            return {'user': user.as_dict()}, 200
-        else:
-            return {'message': 'user id must be integer'}, 400
+        user = UserModel()
+        user.id = user_details[0]
+        user.username = user_details[1]
+        user.role = user_details[2]
+        return {'user': user.as_dict()}, 200
 
     @jwt_required
     def delete(self, u_id):
@@ -93,12 +87,8 @@ class User(Resource):
          403:
            description: Error for Attendant trying to delete product
             """
-        current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
-        if user_details[3] != "admin":
-            abort(401, 'only admin can delete a user')
-        if not u_id.isdigit():
-            abort(400, 'user id must be integer')
+        check_user_admin()
+        check_id_integer(u_id)
         result = UserModel.get_by_id(GET_USER, (u_id,))
         if result is not None:
             user = UserModel()
@@ -120,24 +110,20 @@ class UserList(Resource):
          200:
            description: List of Users Returned Successful
             """
-        current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
-        if user_details[3] == "admin":
-            users = {}
-            result = UserModel.get_all(GET_ALL_USERS)
+        check_user_admin()
+        users = {}
+        result = UserModel.get_all(GET_ALL_USERS)
 
-            for i in range(len(result)):
-                user = UserModel()
-                user.id = result[i][0]
-                user.username = result[i][1]
-                user.role = result[i][2]
-                users[i + 1] = user.as_dict()
-            if users == {}:
-                return {'message': 'no users in system yet'}, 404
+        for i in range(len(result)):
+            user = UserModel()
+            user.id = result[i][0]
+            user.username = result[i][1]
+            user.role = result[i][2]
+            users[i + 1] = user.as_dict()
+        if users == {}:
+            return {'message': 'no users in system yet'}, 404
 
-            return {'users': users}, 200
-
-        return {'message': 'only admin can view users of the system'}, 401
+        return {'users': users}, 200
 
     @jwt_required
     def post(self):
@@ -148,26 +134,22 @@ class UserList(Resource):
          200:
            description: List of Users Returned Successful
             """
-        current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
-        if user_details[3] == "admin":
-            data = request.get_json()
-            username = data['username']
-            password = data['password']
+        check_user_admin()
+        data = request.get_json()
+        username = data['username']
+        password = data['password']
 
-            a_name = username.lower().strip()
-            result = UserModel.get_by_name(GET_USER_BY_NAME, (a_name,))
-            if result is None:
-                user = UserModel()
-                user.username = a_name
-                user.password = password
-                user.role = "attendant"
-                user.save(CREATE_USER, (user.username, user.password, user.role))
-                return {'message': 'attendant created successfully'}, 201
+        a_name = username.lower().strip()
+        result = UserModel.get_by_name(GET_USER_BY_NAME, (a_name,))
+        if result is None:
+            user = UserModel()
+            user.username = a_name
+            user.password = password
+            user.role = "attendant"
+            user.save(CREATE_USER, (user.username, user.password, user.role))
+            return {'message': 'attendant created successfully'}, 201
 
-            abort(400, 'attendant with similar name exists')
-
-        abort(401, 'only admin can add users to the system')
+        abort(400, 'attendant with similar name exists')
 
 
 class UserRegistration(Resource):

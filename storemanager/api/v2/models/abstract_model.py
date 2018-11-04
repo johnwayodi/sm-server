@@ -19,8 +19,8 @@ class AbstractModel:
 
     def save(self, statement, values):
         """create a new item using the entity details specified"""
-        global conn, result_row
         try:
+            global conn, result_row
             conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, values)
@@ -37,8 +37,8 @@ class AbstractModel:
     @classmethod
     def get_by_id(cls, statement, value):
         """Retrieve the entity with the specified id"""
-        global conn, result_row
         try:
+            global conn, result_row
             conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, value)
@@ -55,8 +55,8 @@ class AbstractModel:
 
     def delete(self, statement, value):
         """Delete the entity with the specified id"""
-        global conn, rows_deleted
         try:
+            global conn, rows_deleted
             conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, value)
@@ -73,8 +73,8 @@ class AbstractModel:
 
     def update(self, statement, values):
         """Update the entity with the specified id"""
-        global conn, rows_updated
         try:
+            global conn, rows_updated
             conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, values)
@@ -92,8 +92,8 @@ class AbstractModel:
     @classmethod
     def get_all(cls, statement):
         """Returns multiple rows of the type of entity"""
-        global conn, result_rows
         try:
+            global conn, result_rows
             conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement)
@@ -111,8 +111,8 @@ class AbstractModel:
     @classmethod
     def get_one(cls, statement):
         """Returns one row result"""
-        global conn, result_rows
         try:
+            global conn, result_rows
             conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement)
@@ -130,8 +130,8 @@ class AbstractModel:
     @classmethod
     def get_all_by_id(cls, statement, values):
         """Returns all entities which contain the specified id"""
-        global conn, result_rows
         try:
+            global conn, result_rows
             conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, values)
@@ -149,8 +149,8 @@ class AbstractModel:
     @classmethod
     def get_by_name(cls, statement, value):
         """Returns the entity with the specified name"""
-        global conn, result_row
         try:
+            global conn, result_row
             conn = DB.connect()
             cur = conn.cursor()
             cur.execute(statement, value)
