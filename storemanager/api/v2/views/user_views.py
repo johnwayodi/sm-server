@@ -1,12 +1,12 @@
 from flask import request, abort
 from flask_expects_json import expects_json
-from flask_jwt_extended import jwt_required, create_access_token, \
-    get_jwt_identity
+from flask_jwt_extended import jwt_required, create_access_token
 from flask_restful import Resource
 
 from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.models.user import UserModel
 from storemanager.api.v2.utils.validators import CustomValidator
+from storemanager.api.v2.utils.check_role import check_user_identity
 
 USER_REGISTRATION_SCHEMA = {
     'type': 'object',
@@ -51,9 +51,7 @@ class User(Resource):
          403:
            description: Error shown to Attendant trying to delete product
             """
-        current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
-        if user_details[3] != "admin":
+        if check_user_identity() != "admin":
             abort(401, 'only admin can view a user account')
         if u_id.isdigit():
             user_details = UserModel.get_by_id(GET_USER, (u_id,))
@@ -93,9 +91,7 @@ class User(Resource):
          403:
            description: Error for Attendant trying to delete product
             """
-        current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
-        if user_details[3] != "admin":
+        if check_user_identity() != "admin":
             abort(401, 'only admin can delete a user')
         if not u_id.isdigit():
             abort(400, 'user id must be integer')
@@ -120,9 +116,7 @@ class UserList(Resource):
          200:
            description: List of Users Returned Successful
             """
-        current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
-        if user_details[3] == "admin":
+        if check_user_identity() == "admin":
             users = {}
             result = UserModel.get_all(GET_ALL_USERS)
 
@@ -148,26 +142,23 @@ class UserList(Resource):
          200:
            description: List of Users Returned Successful
             """
-        current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
-        if user_details[3] == "admin":
-            data = request.get_json()
-            username = data['username']
-            password = data['password']
+        if check_user_identity() != "admin":
+            abort(401, 'only admin can add users to the system')
+        data = request.get_json()
+        username = data['username']
+        password = data['password']
 
-            a_name = username.lower().strip()
-            result = UserModel.get_by_name(GET_USER_BY_NAME, (a_name,))
-            if result is None:
-                user = UserModel()
-                user.username = a_name
-                user.password = password
-                user.role = "attendant"
-                user.save(CREATE_USER, (user.username, user.password, user.role))
-                return {'message': 'attendant created successfully'}, 201
+        a_name = username.lower().strip()
+        result = UserModel.get_by_name(GET_USER_BY_NAME, (a_name,))
+        if result is None:
+            user = UserModel()
+            user.username = a_name
+            user.password = password
+            user.role = "attendant"
+            user.save(CREATE_USER, (user.username, user.password, user.role))
+            return {'message': 'attendant created successfully'}, 201
 
-            abort(400, 'attendant with similar name exists')
-
-        abort(401, 'only admin can add users to the system')
+        abort(400, 'attendant with similar name exists')
 
 
 class UserRegistration(Resource):

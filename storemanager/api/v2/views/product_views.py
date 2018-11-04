@@ -8,6 +8,7 @@ from storemanager.api.v2.models.category import CategoryModel
 from storemanager.api.v2.models.product import ProductModel
 from storemanager.api.v2.models.user import UserModel
 from storemanager.api.v2.utils.validators import CustomValidator
+from storemanager.api.v2.utils.check_role import check_user_identity
 
 PRODUCT_SCHEMA = {
     'type': 'object',
@@ -55,27 +56,26 @@ class Product(Resource):
            description: Returned when value passed in as
             product_id is not an integer.
             """
-        if product_id.isdigit():
-            result = ProductModel.get_by_id(GET_PRODUCT, (product_id,))
-            if result is None:
-                return {'message': 'product with id does not exist'}, 404
-
-            product = ProductModel()
-            product.id = result[0]
-            product.name = result[1]
-            product.price = result[2]
-            product.stock = result[3]
-            product.min_stock = result[4]
-            product.description = result[5]
-
-            category_details = CategoryModel.get_by_id(
-                GET_CATEGORY, (result[6],))
-            category_name = category_details[1]
-            product.category = category_name
-
-            return {'product': product.as_dict()}, 200
-        else:
+        if not product_id.isdigit():
             return {'message': 'product id must be integer'}, 400
+        result = ProductModel.get_by_id(GET_PRODUCT, (product_id,))
+        if result is None:
+            return {'message': 'product with id does not exist'}, 404
+
+        product = ProductModel()
+        product.id = result[0]
+        product.name = result[1]
+        product.price = result[2]
+        product.stock = result[3]
+        product.min_stock = result[4]
+        product.description = result[5]
+
+        category_details = CategoryModel.get_by_id(
+            GET_CATEGORY, (result[6],))
+        category_name = category_details[1]
+        product.category = category_name
+
+        return {'product': product.as_dict()}, 200
 
     @jwt_required
     def put(self, product_id):
@@ -103,59 +103,51 @@ class Product(Resource):
          404:
            description: Product with specified id does not exist.
             """
-        current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
-        if user_details[3] == "admin":
-            if product_id.isdigit():
-                data = request.get_json()
-                name = data['name']
-                description = data['description']
-                price = data['price']
-                stock = data['stock']
-                min_stock = data['min_stock']
-                category = data['category']
-
-                p_name = name.lower().strip()
-                p_cat = category.lower().strip()
-                category_details = CategoryModel.get_by_name(
-                    GET_CATEGORY_BY_NAME, (p_cat,))
-                if category_details is None:
-                    return {'message': 'category provided does not exist'}, 404
-                category_id = category_details[0]
-
-                result = ProductModel.get_by_id(GET_PRODUCT, (product_id,))
-                if result is None:
-                    return {'message': 'product with id does not exist'}, 404
-
-                product = ProductModel()
-                product.id = result[0]
-                values = (p_name, description, price, stock,
-                          min_stock, category_id, product.id)
-                product.update(UPDATE_PRODUCT, values)
-                return {'message': 'product updated successfully'}, 200
-
+        if check_user_identity() != "admin":
+            return {'message': 'only administrator can delete a product'}, 403
+        if not product_id.isdigit():
             return {'message': 'provided id is not an integer'}, 400
+        data = request.get_json()
+        name = data['name']
+        description = data['description']
+        price = data['price']
+        stock = data['stock']
+        min_stock = data['min_stock']
+        category = data['category']
 
-        return {'message': 'only administrator can delete a product'}, 403
+        p_name = name.lower().strip()
+        p_cat = category.lower().strip()
+        category_details = CategoryModel.get_by_name(
+            GET_CATEGORY_BY_NAME, (p_cat,))
+        if category_details is None:
+            return {'message': 'category provided does not exist'}, 404
+        category_id = category_details[0]
+
+        result = ProductModel.get_by_id(GET_PRODUCT, (product_id,))
+        if result is None:
+            return {'message': 'product with id does not exist'}, 404
+
+        product = ProductModel()
+        product.id = result[0]
+        values = (p_name, description, price, stock,
+                  min_stock, category_id, product.id)
+        product.update(UPDATE_PRODUCT, values)
+        return {'message': 'product updated successfully'}, 200
 
     @jwt_required
     def delete(self, product_id):
-        current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
-        if user_details[3] == "admin":
-            if product_id.isdigit():
-                result = ProductModel.get_by_id(GET_PRODUCT, (product_id,))
-                if result is None:
-                    return {'message': 'product with id does not exist'}, 404
-
-                product = ProductModel()
-                product.id = result[0]
-                product.delete(DELETE_PRODUCT, (product_id,))
-                return {'message': 'product deleted successfully'}, 200
-
+        if check_user_identity() != "admin":
+            return {'message': 'only administrator can delete a product'}, 403
+        if not product_id.isdigit():
             return {'message': 'provided id is not an integer'}, 400
+        result = ProductModel.get_by_id(GET_PRODUCT, (product_id,))
+        if result is None:
+            return {'message': 'product with id does not exist'}, 404
 
-        return {'message': 'only administrator can delete a product'}, 403
+        product = ProductModel()
+        product.id = result[0]
+        product.delete(DELETE_PRODUCT, (product_id,))
+        return {'message': 'product deleted successfully'}, 200
 
 
 class ProductList(Resource):
@@ -254,9 +246,7 @@ class ProductList(Resource):
              400:
                description: Handles all Validation Errors
             """
-        current_user = get_jwt_identity()
-        user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
-        if user_details[3] == "admin":
+        if check_user_identity() == "admin":
             data = request.get_json()
             product_name = data['name']
             product_price = data['price']

@@ -62,34 +62,33 @@ class SaleRecord(Resource):
            description: Validation Error, Only an integer value
             can be accepted as valid
             """
-        if s_id.isdigit():
-            sale_details = SaleRecordModel.get_by_id(GET_SALE, (s_id,))
-            if sale_details is None:
-                return {'message': 'sale with given id does not exist'}, 404
-
-            sale = SaleRecordModel()
-            sale.id = sale_details[0]
-            sale.items = sale_details[1]
-            sale.total = sale_details[2]
-            sale.attendant = sale_details[3]
-            sale_products = SaleRecordModelItem.get_all_by_id(
-                GET_SALE_ITEMS, (sale.id,))
-            products = {}
-            for i in range(len(sale_products)):
-                product = {
-                    'name': sale_products[i][0],
-                    'price': sale_products[i][1],
-                    'quantity': sale_products[i][2],
-                    'cost': sale_products[i][3]}
-                products[i + 1] = product
-
-            return {'id': sale.id,
-                    'products': products,
-                    'items': sale.items,
-                    'total': sale.total,
-                    'attendant_id': sale.attendant}, 200
-        else:
+        if not s_id.isdigit():
             return {'message': 'sale id must be integer'}, 400
+        sale_details = SaleRecordModel.get_by_id(GET_SALE, (s_id,))
+        if sale_details is None:
+            return {'message': 'sale with given id does not exist'}, 404
+
+        sale = SaleRecordModel()
+        sale.id = sale_details[0]
+        sale.items = sale_details[1]
+        sale.total = sale_details[2]
+        sale.attendant = sale_details[3]
+        sale_products = SaleRecordModelItem.get_all_by_id(
+            GET_SALE_ITEMS, (sale.id,))
+        products = {}
+        for i in range(len(sale_products)):
+            product = {
+                'name': sale_products[i][0],
+                'price': sale_products[i][1],
+                'quantity': sale_products[i][2],
+                'cost': sale_products[i][3]}
+            products[i + 1] = product
+
+        return {'id': sale.id,
+                'products': products,
+                'items': sale.items,
+                'total': sale.total,
+                'attendant_id': sale.attendant}, 200
 
 
 class SaleRecords(Resource):
