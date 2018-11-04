@@ -3,6 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/johnwayodi/sm-api-v2/badge.svg?branch=develop)](https://coveralls.io/github/johnwayodi/sm-api-v2?branch=develop)
 [![Build Status](https://travis-ci.org/johnwayodi/sm-api-v2.svg?branch=develop)](https://travis-ci.org/johnwayodi/sm-api-v2)
 [![Maintainability](https://api.codeclimate.com/v1/badges/c23849e92db44dd7a9b2/maintainability)](https://codeclimate.com/github/johnwayodi/sm-api-v2/maintainability)
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/faa1bb2518cd81a3e91d)
 
 Store Manager is a web application for use in a single store. There are two users: Administrator and Attendant.
@@ -178,5 +179,9 @@ The following software tools were used in the development of this application:
 7. [Postman](https://www.getpostman.com/): For Manual Testing and generation of Documentation.
 8. [PostgreSQL](https://www.postgresql.org/): Database.
 
-#### Contributors
+##### Contributors
 [John Wayodi](https://github.com/johnwayodi)
+
+##### Acknowledgments
+
+The development of this software was done with the support of [Andela](https://andela.com/) Kenya.
