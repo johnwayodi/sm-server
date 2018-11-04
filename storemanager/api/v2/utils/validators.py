@@ -47,9 +47,9 @@ class CustomValidator:
 
         # validation checks for product description
         if p_desc.isdigit():
-            abort(400, 'category cannot be an integer value')
+            abort(400, 'description cannot be an integer value')
         if not p_desc or p_desc.isspace():
-            abort(400, 'category should not be empty')
+            abort(400, 'description should not be empty')
 
         # validation checks for product category
         if p_cat.isdigit():
