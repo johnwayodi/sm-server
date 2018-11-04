@@ -73,7 +73,7 @@ def test_admin_get_attendant_not_exist(client, authorize_admin):
 def test_admin_get_attendant_non_integer(client, authorize_admin):
     """admin should be able to pass a non integer value in url"""
     headers = authorize_admin
-    expected_message = 'user id must be integer'
+    expected_message = 'provided id is not an integer'
 
     response = client.get('/api/v2/users/a', headers=headers)
     data = response.get_json()
@@ -91,7 +91,7 @@ def test_admin_get_users(client, authorize_admin):
 def test_admin_delete_attendant_non_integer(client, authorize_admin):
     """admin should be able to pass a non integer value in url"""
     headers = authorize_admin
-    expected_message = 'user id must be integer'
+    expected_message = 'provided id is not an integer'
 
     response = client.delete('/api/v2/users/a', headers=headers)
     data = response.get_json()

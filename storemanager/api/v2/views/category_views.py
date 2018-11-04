@@ -6,7 +6,7 @@ from flask_restful import Resource
 from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.models.category import CategoryModel
 from storemanager.api.v2.utils.validators import CustomValidator
-from storemanager.api.v2.utils.check_role import check_user_admin
+from storemanager.api.v2.utils.custom_checks import *
 
 CATEGORY_SCHEMA = {
     'type': 'object',
@@ -58,8 +58,7 @@ class Category(Resource):
     @jwt_required
     def put(self, category_id):
         check_user_admin()
-        if not category_id.isdigit():
-            return {'message': 'provided id is not an integer'}, 400
+        check_id_integer(category_id)
         data = request.get_json()
         name = data.get('name')
         c_name = name.lower().strip()
@@ -77,8 +76,7 @@ class Category(Resource):
     @jwt_required
     def delete(self, category_id):
         check_user_admin()
-        if not category_id.isdigit():
-            return {'message': 'provided id is not an integer'}, 400
+        check_id_integer(category_id)
 
         result = CategoryModel.get_by_id(GET_CATEGORY, (category_id,))
         if result is None:

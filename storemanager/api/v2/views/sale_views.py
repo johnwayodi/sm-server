@@ -8,6 +8,7 @@ from storemanager.api.v2.models.product import ProductModel
 from storemanager.api.v2.models.sale_record import *
 from storemanager.api.v2.models.user import UserModel
 from storemanager.api.v2.utils.validators import CustomValidator
+from storemanager.api.v2.utils.custom_checks import check_id_integer
 
 SALES_SCHEMA = {
     "type": "object",
@@ -62,8 +63,7 @@ class SaleRecord(Resource):
            description: Validation Error, Only an integer value
             can be accepted as valid
             """
-        if not s_id.isdigit():
-            return {'message': 'sale id must be integer'}, 400
+        check_id_integer(s_id)
         sale_details = SaleRecordModel.get_by_id(GET_SALE, (s_id,))
         if sale_details is None:
             return {'message': 'sale with given id does not exist'}, 404

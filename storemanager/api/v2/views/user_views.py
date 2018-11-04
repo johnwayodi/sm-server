@@ -4,9 +4,8 @@ from flask_jwt_extended import jwt_required, create_access_token
 from flask_restful import Resource
 
 from storemanager.api.v2.database.queries import *
-from storemanager.api.v2.models.user import UserModel
 from storemanager.api.v2.utils.validators import CustomValidator
-from storemanager.api.v2.utils.check_role import check_user_admin
+from storemanager.api.v2.utils.custom_checks import *
 
 USER_REGISTRATION_SCHEMA = {
     'type': 'object',
@@ -52,18 +51,16 @@ class User(Resource):
            description: Error shown to Attendant trying to delete product
             """
         check_user_admin()
-        if u_id.isdigit():
-            user_details = UserModel.get_by_id(GET_USER, (u_id,))
-            if user_details is None:
-                return {'message': 'user with id does not exist'}, 404
+        check_id_integer(u_id)
+        user_details = UserModel.get_by_id(GET_USER, (u_id,))
+        if user_details is None:
+            return {'message': 'user with id does not exist'}, 404
 
-            user = UserModel()
-            user.id = user_details[0]
-            user.username = user_details[1]
-            user.role = user_details[2]
-            return {'user': user.as_dict()}, 200
-        else:
-            return {'message': 'user id must be integer'}, 400
+        user = UserModel()
+        user.id = user_details[0]
+        user.username = user_details[1]
+        user.role = user_details[2]
+        return {'user': user.as_dict()}, 200
 
     @jwt_required
     def delete(self, u_id):
@@ -91,8 +88,7 @@ class User(Resource):
            description: Error for Attendant trying to delete product
             """
         check_user_admin()
-        if not u_id.isdigit():
-            abort(400, 'user id must be integer')
+        check_id_integer(u_id)
         result = UserModel.get_by_id(GET_USER, (u_id,))
         if result is not None:
             user = UserModel()

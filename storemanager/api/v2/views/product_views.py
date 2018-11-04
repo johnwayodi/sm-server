@@ -7,7 +7,7 @@ from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.models.category import CategoryModel
 from storemanager.api.v2.models.product import ProductModel
 from storemanager.api.v2.utils.validators import CustomValidator
-from storemanager.api.v2.utils.check_role import check_user_admin
+from storemanager.api.v2.utils.custom_checks import *
 
 PRODUCT_SCHEMA = {
     'type': 'object',
@@ -55,8 +55,7 @@ class Product(Resource):
            description: Returned when value passed in as
             product_id is not an integer.
             """
-        if not product_id.isdigit():
-            return {'message': 'product id must be integer'}, 400
+        check_id_integer(product_id)
         result = ProductModel.get_by_id(GET_PRODUCT, (product_id,))
         if result is None:
             return {'message': 'product with id does not exist'}, 404
@@ -103,8 +102,7 @@ class Product(Resource):
            description: Product with specified id does not exist.
             """
         check_user_admin()
-        if not product_id.isdigit():
-            abort(400, 'provided id is not an integer')
+        check_id_integer(product_id)
         data = request.get_json()
         name = data['name']
         description = data['description']
@@ -135,8 +133,7 @@ class Product(Resource):
     @jwt_required
     def delete(self, product_id):
         check_user_admin()
-        if not product_id.isdigit():
-            return {'message': 'provided id is not an integer'}, 400
+        check_id_integer(product_id)
         result = ProductModel.get_by_id(GET_PRODUCT, (product_id,))
         if result is None:
             return {'message': 'product with id does not exist'}, 404

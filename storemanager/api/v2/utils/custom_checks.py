@@ -15,3 +15,8 @@ def check_user_admin():
     user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
     if user_details[3] != "admin":
         abort(401, 'action failed, user is not administrator')
+
+
+def check_id_integer(entity_id):
+    if not entity_id.isdigit():
+        abort(400, 'provided id is not an integer')
