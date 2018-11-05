@@ -1,0 +1,20 @@
+Retrieve All Products
+Returns all the products present in the inventory
+---
+tags:
+- products
+parameters:
+- in: header
+  name: Authorization
+  description: The jwt token generated during user
+    login example (Bearer eyGssads...)
+  type: string
+  required: true
+responses:
+  200:
+    description: Success, list of products is returned.
+  404:
+    description: Not Found, no products added to system yet
+  422:
+    description: Bad Authorization Error, Check that your Authorization is in the correct
+      format

@@ -2,6 +2,7 @@ from flask import request, abort
 from flask_expects_json import expects_json
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource
+from flasgger import swag_from
 
 from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.models.category import CategoryModel
@@ -29,32 +30,9 @@ class Product(Resource):
     """Allows requests on a single product"""
 
     @jwt_required
+    @swag_from('docs/product_get.yml')
     def get(self, product_id):
-        """
-       Retrieve a Product
-       ---
-       parameters:
-         - in: header
-           name: Authorization
-           description: The jwt token generated during user login
-            example (Bearer eyGssads...)
-           type: string
-           required: true
-           default: Bearer token
-         - in: path
-           name: p_id
-           type: string
-           required: true
-           description: The Product Id
-       responses:
-         200:
-           description: Success, Product Deleted
-         403:
-           description: Forbidden, Attendant can not delete Product
-         400:
-           description: Returned when value passed in as
-            product_id is not an integer.
-            """
+        """get one product"""
         check_id_integer(product_id)
         result = ProductModel.get_by_id(GET_PRODUCT, (product_id,))
         if result is None:
@@ -76,31 +54,9 @@ class Product(Resource):
         return {'product': product.as_dict()}, 200
 
     @jwt_required
+    @swag_from('docs/product_put.yml')
     def put(self, product_id):
-        """
-       Updates a Product
-       ---
-       parameters:
-         - in: header
-           name: Authorization
-           description: The jwt token generated during user
-            login example (Bearer eyGssads...)
-           type: string
-           required: true
-           default: Bearer token
-         - in: path
-           name: p_id
-           type: string
-           required: true
-           description: The Product Id
-       responses:
-         200:
-           description: Product Deleted
-         403:
-           description: Forbidden, Attendant can not delete Product
-         404:
-           description: Product with specified id does not exist.
-            """
+        """update a product"""
         check_user_admin()
         check_id_integer(product_id)
         data = request.get_json()
@@ -131,7 +87,9 @@ class Product(Resource):
         return {'message': 'product updated successfully'}, 200
 
     @jwt_required
+    @swag_from('docs/product_delete.yml')
     def delete(self, product_id):
+        """delete a product"""
         check_user_admin()
         check_id_integer(product_id)
         result = ProductModel.get_by_id(GET_PRODUCT, (product_id,))
@@ -148,27 +106,9 @@ class ProductList(Resource):
     """Allows requests on products"""
 
     @jwt_required
+    @swag_from('docs/product_get_all.yml')
     def get(self):
-        """
-       Get All Products
-       ---
-       parameters:
-         - in: header
-           name: Authorization
-           description: The jwt token generated during user
-            login example (Bearer eyGssads...)
-           type: string
-           required: true
-           default: Bearer token
-       responses:
-         200:
-           description: Successful
-         404:
-           description: No products added to system yet
-         422:
-           description: Bad Authorization Error, Ensure jwt key is
-            in the proper format in header.
-            """
+        """get all products"""
         products = {}
         result = ProductModel.get_all(GET_ALL_PRODUCTS)
         for i in range(len(result)):
@@ -193,53 +133,9 @@ class ProductList(Resource):
 
     @jwt_required
     @expects_json(PRODUCT_SCHEMA)
+    @swag_from('docs/product_post.yml')
     def post(self):
-        """
-            Add New Product
-           ---
-           consumes:
-             - application/json
-           parameters:
-             - in: header
-               name: Authorization
-               description: The jwt token generated during user
-                login example (Bearer eyGssads...)
-               type: string
-               required: true
-               default: Bearer token
-             - in: body
-               name: Product Details
-               description: The Product to be added to Inventory
-               schema:
-                 type: object
-                 required:
-                   - name
-                   - price
-                   - description
-                   - category
-                   - stock
-                   - min_stock
-                 properties:
-                    name:
-                      type: string
-                    price:
-                      type: integer
-                    description:
-                      type: string
-                    category:
-                      type: string
-                    stock:
-                      type: integer
-                    min_stock:
-                      type: integer
-           responses:
-             200:
-               description: The Product has been added successfully
-             403:
-               description: Admin user cannot create Sale Record
-             400:
-               description: Handles all Validation Errors
-            """
+        """add a new product"""
         check_user_admin()
         data = request.get_json()
         product_name = data['name']

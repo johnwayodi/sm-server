@@ -1,0 +1,25 @@
+Retrieve a Product
+Returns a product with the specified id.
+---
+tags:
+- products
+parameters:
+- in: header
+  name: Authorization
+  description: The jwt token generated during user login
+    example (Bearer eyGssads...)
+  type: string
+  required: true
+- in: path
+  name: product_id
+  type: string
+  required: true
+  description: The id of the product to view.
+responses:
+  200:
+    description: Success, Product Deleted
+  403:
+    description: Forbidden, Attendant can not delete Product
+  400:
+    description: Returned when value passed in as
+      product_id is not an integer.

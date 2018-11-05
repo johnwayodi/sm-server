@@ -15,10 +15,10 @@ api.add_resource(ProductList, '/products')
 api.add_resource(Product, '/products/<product_id>')
 
 api.add_resource(SaleRecords, '/sales')
-api.add_resource(SaleRecord, '/sales/<s_id>')
+api.add_resource(SaleRecord, '/sales/<sale_id>')
 
 api.add_resource(UserList, '/users')
-api.add_resource(User, '/users/<u_id>')
+api.add_resource(User, '/users/<user_id>')
 
 api.add_resource(Category, '/categories/<category_id>')
 api.add_resource(Categories, '/categories')

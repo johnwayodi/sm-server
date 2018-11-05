@@ -1,0 +1,35 @@
+Add a new Category
+Allows the addition of a new category to the inventory.
+This endpoint is accessible by only the Administrator.
+---
+tags:
+- categories
+consumes:
+- application/json
+parameters:
+- in: header
+  name: Authorization
+  description: The jwt token generated during user
+    login example (Bearer eyGssads...)
+  type: string
+  required: true
+- in: body
+  name: Category Details
+  description: The Details of the category to be added to Inventory
+  schema:
+    type: object
+    required:
+    - name
+    - description
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+responses:
+  201:
+    description: Success, the category has been added successfully
+  401:
+    description: Unauthorized, displayed to an Attendant who tries to create new category.
+  400:
+    description: Bad Request, handles all validation errors

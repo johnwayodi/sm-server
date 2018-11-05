@@ -2,6 +2,7 @@ from flask import request, abort
 from flask_expects_json import expects_json
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource
+from flasgger import swag_from
 
 from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.models.category import CategoryModel
@@ -23,24 +24,8 @@ class Category(Resource):
     """Allows crud on single category object"""
 
     @jwt_required
+    @swag_from('docs/category_get.yml')
     def get(self, category_id):
-        """
-       Retrieve a Single Category item
-       ---
-       parameters:
-         - in: path
-           name: category_id
-           type: string
-           required: true
-       responses:
-         200:
-           description: Displayed when user deleted successfully
-         404:
-           description: Displayed when no user is found with specified id
-         403:
-           description: Error shown to Attendant trying to delete product
-            """
-
         check_user_admin()
         if not category_id.isdigit():
             return {'message': 'provided id is not an integer'}, 400
@@ -56,6 +41,7 @@ class Category(Resource):
                 'category': category.as_dict()}, 200
 
     @jwt_required
+    @swag_from('docs/category_put.yml')
     def put(self, category_id):
         check_user_admin()
         check_id_integer(category_id)
@@ -74,6 +60,7 @@ class Category(Resource):
         return {'message': 'category updated successfully'}, 200
 
     @jwt_required
+    @swag_from('docs/category_delete.yml')
     def delete(self, category_id):
         check_user_admin()
         check_id_integer(category_id)
@@ -92,6 +79,7 @@ class Categories(Resource):
     """Allows crud on categories"""
 
     @jwt_required
+    @swag_from('docs/category_get_all.yml')
     def get(self):
         check_user_admin()
         categories = {}
@@ -109,6 +97,7 @@ class Categories(Resource):
 
     @jwt_required
     @expects_json(CATEGORY_SCHEMA)
+    @swag_from('docs/category_post.yml')
     def post(self):
         check_user_admin()
         data = request.get_json()

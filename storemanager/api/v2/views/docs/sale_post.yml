@@ -1,0 +1,44 @@
+Create a Sale Record
+This endpoint allows the creation of a sale record.
+Only an Attendant can create a sale record.
+---
+tags:
+- sales
+consumes:
+- application/json
+parameters:
+- in: header
+  name: Authorization
+  description: The jwt token generated during user login
+    example (Bearer eyGssads...)
+  type: string
+  required: true
+- in: body
+  name: Sale Record Details
+  description: The Sale Record to be Created, count is the
+    number of units to be sold for the product
+  schema:
+    type: object
+    required:
+    - username
+    - password
+    - role
+    properties:
+      products:
+        type: object
+        properties:
+          1:
+            type: object
+            properties:
+              product_id:
+                type: integer
+              count:
+                type: integer
+responses:
+  201:
+    description: Success, Sale Record Created Successfully
+  400:
+    description: Bad Request, validation check failed.
+  401:
+    description: Unauthorized, displayed when
+      Administrator tries to create a sale record

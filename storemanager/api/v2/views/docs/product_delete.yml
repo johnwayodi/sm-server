@@ -1,0 +1,27 @@
+Delete a Product
+Allows the removal of a produt from the inventory
+This endpoint is only accessible to the Admin
+---
+tags:
+- products
+parameters:
+- in: header
+  name: Authorization
+  description: The jwt token generated during user login
+    example (Bearer eyGssads...)
+  type: string
+  required: true
+- in: path
+  name: product_id
+  type: string
+  required: true
+  description: The id of the product to delete.
+responses:
+  200:
+    description: Success, Product Deleted
+  400:
+    description: Returned when value passed in as id is not an integer.
+  401:
+    description: Unauthorized, response when Attendant tries to delete a product
+  404:
+    description: Returned when product with id specified does not exist.

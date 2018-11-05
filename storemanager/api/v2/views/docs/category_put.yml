@@ -1,0 +1,38 @@
+Update a Category
+Allows details of a category to be updated.
+This endpoint is only accessible to the Administrator
+---
+tags:
+- categories
+parameters:
+- in: header
+  name: Authorization
+  description: The jwt token generated during user
+    login example (Bearer eyGssads...)
+  type: string
+  required: true
+- in: path
+  name: category_id
+  type: string
+  required: true
+  description: The id of the category to be updated
+- in: body
+  name: Updated Category Details
+  description: The details of the category to be added to Inventory
+  schema:
+    type: object
+    required:
+    - name
+    - description
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+responses:
+  200:
+    description: Success, category updated successfully
+  401:
+    description: Unauthorized, displayed when attendant tries to updated a category
+  404:
+    description: Not Found, Product with specified id does not exist

@@ -1,0 +1,18 @@
+Retrieve a Single Category item
+Returns a category with the specified id.
+This endpoint is only accessible by the Administrator.
+---
+tags:
+- categories
+parameters:
+- name: category_id
+  in: path
+  type: string
+  required: true
+responses:
+  200:
+    description: Success, User deleted successfully
+  401:
+    description: Unauthorized, Displayed to Attendant trying to delete product
+  404:
+    description: Not Found, No user is found with specified id
