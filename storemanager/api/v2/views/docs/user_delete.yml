@@ -1,0 +1,24 @@
+Delete a User
+Allows the removal of a user from the system
+This endpoint is only accessible to the Administrator
+---
+tags:
+- users
+parameters:
+- in: header
+  name: Authorization
+  description: The jwt token generated during user login
+    example (Bearer eyGssads...)
+  type: string
+  required: true
+- in: path
+  name: user_id
+  type: integer
+  required: true
+responses:
+  200:
+    description: Success, user deleted successfully
+  401:
+    description: Unauthorized, response when Attendant tries to delete a user
+  404:
+    description: Not Found, user with id does not exist

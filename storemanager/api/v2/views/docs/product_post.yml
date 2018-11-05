@@ -1,0 +1,47 @@
+Add New Product
+This endpoint allows the addition of a new product to the inventory.
+Only Administrator can add a product.
+---
+tags:
+- products
+consumes:
+- application/json
+parameters:
+- in: header
+  name: Authorization
+  description: The jwt token generated during user
+    login example (Bearer eyGssads...)
+  type: string
+  required: true
+- in: body
+  name: Product Details
+  description: The Details of the product to be added to Inventory
+  schema:
+    type: object
+    required:
+    - name
+    - price
+    - description
+    - category
+    - stock
+    - min_stock
+    properties:
+      name:
+        type: string
+      price:
+        type: integer
+      description:
+        type: string
+      category:
+        type: string
+      stock:
+        type: integer
+      min_stock:
+        type: integer
+responses:
+  201:
+    description: Success, the product has been added successfully
+  401:
+    description: Unauthorized, displayed to an Attendant who tries to create new product.
+  400:
+    description: Bad Request, handles all validation errors

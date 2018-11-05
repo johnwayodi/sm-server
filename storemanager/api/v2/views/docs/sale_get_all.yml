@@ -1,0 +1,17 @@
+Get all Sale Records
+Returns all the created sale records
+---
+tags:
+- sales
+parameters:
+- in: header
+  name: Authorization
+  description: The jwt token generated during user
+    login example (Bearer eyGssads...)
+  type: string
+  required: true
+responses:
+  200:
+    description: Success, lists of sale records returned successfully
+  404:
+    description: Not Found, no sale record created yet

@@ -1,0 +1,27 @@
+Delete a Category
+Allows the removal of a category from the inventory
+This endpoint is only accessible to the Administrator
+---
+tags:
+- categories
+parameters:
+- in: header
+  name: Authorization
+  description: The jwt token generated during user login
+    example (Bearer eyGssads...)
+  type: string
+  required: true
+- in: path
+  name: category_id
+  type: string
+  required: true
+  description: The id of the category to delete.
+responses:
+  200:
+    description: Success, category deleted
+  400:
+    description: Bad Request, when value passed in as id is not an integer.
+  401:
+    description: Unauthorized, response when attendant tries to delete a category
+  404:
+    description: Not Found, returned when category with id specified does not exist.

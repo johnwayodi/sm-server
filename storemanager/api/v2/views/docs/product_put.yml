@@ -1,0 +1,25 @@
+Update a Product
+Allows a products details to be updated.
+This endpoint is only accessible to the Administrator
+---
+tags:
+- products
+parameters:
+- in: header
+  name: Authorization
+  description: The jwt token generated during user
+    login example (Bearer eyGssads...)
+  type: string
+  required: true
+- in: path
+  name: product_id
+  type: string
+  required: true
+  description: The id of the product to be updated
+responses:
+  200:
+    description: Product Updated successfully
+  403:
+    description: Forbidden, Only Admin can updated a Product
+  404:
+    description: Product with specified id does not exist.

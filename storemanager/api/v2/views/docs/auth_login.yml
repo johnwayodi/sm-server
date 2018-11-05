@@ -1,0 +1,32 @@
+Login User
+This endpoint allows a user to login.
+Both the Administrator and Attendant use this endpoint
+to access system.
+---
+tags:
+- auth
+consumes:
+- application/json
+parameters:
+- in: body
+  name: Login Credentials
+  description: The User credentials for login
+  schema:
+    type: object
+    required:
+    - username
+    - password
+    properties:
+      username:
+        type: string
+        default: Jack
+      password:
+        type: string
+        default: ryan001
+responses:
+  200:
+    description: Success, login successful, access token is generated and returned in response body
+  400:
+    description: Bad Request, validation check failed.
+  404:
+    description: Not found, user with provided username does not exist

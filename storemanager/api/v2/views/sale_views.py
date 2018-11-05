@@ -2,6 +2,7 @@ from flask import request
 from flask_expects_json import expects_json
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import Resource
+from flasgger import swag_from
 
 from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.models.product import ProductModel
@@ -35,36 +36,11 @@ class SaleRecord(Resource):
     """Allows requests on a single sale"""
 
     @jwt_required
-    def get(self, s_id):
-        """
-       Get a Single Sale Record
-       ---
-       parameters:
-         - in: header
-           name: Authorization
-           description: The jwt token generated during
-            user login example (Bearer eyGssads...)
-           type: string
-           required: true
-           default: Bearer token
-         - in: path
-           name: s_id
-           type: string
-           required: true
-           description: The Sale Record Id
-       responses:
-         200:
-           description: Sale Record with specified id is
-            returned successfully
-         404:
-           description: No sale record matches the id specified,
-            hence not found
-         400:
-           description: Validation Error, Only an integer value
-            can be accepted as valid
-            """
-        check_id_integer(s_id)
-        sale_details = SaleRecordModel.get_by_id(GET_SALE, (s_id,))
+    @swag_from('docs/sale_get.yml')
+    def get(self, sale_id):
+        """get a sle record"""
+        check_id_integer(sale_id)
+        sale_details = SaleRecordModel.get_by_id(GET_SALE, (sale_id,))
         if sale_details is None:
             return {'message': 'sale with given id does not exist'}, 404
 
@@ -95,24 +71,9 @@ class SaleRecords(Resource):
     """Allows requests on sales"""
 
     @jwt_required
+    @swag_from('docs/sale_get_all.yml')
     def get(self):
-        """
-       Get all Sale Records
-       ---
-       parameters:
-         - in: header
-           name: Authorization
-           description: The jwt token generated during user
-            login example (Bearer eyGssads...)
-           type: string
-           required: true
-           default: Bearer token
-       responses:
-         200:
-           description: lists of sale records returned successfully
-         404:
-           description: empty, no sale record created yet
-            """
+        """get all sale records"""
         sales = {}
         result = SaleRecordModel.get_all(GET_ALL_SALES)
 
@@ -130,48 +91,9 @@ class SaleRecords(Resource):
 
     @jwt_required
     @expects_json(SALES_SCHEMA)
+    @swag_from('docs/sale_post.yml')
     def post(self):
-        """
-       Create a Sale Record
-       ---
-       consumes:
-         - application/json
-       parameters:
-         - in: header
-           name: Authorization
-           description: The jwt token generated during user login
-            example (Bearer eyGssads...)
-           type: string
-           required: true
-           default: Bearer token
-         - in: body
-           name: Sale Record Details
-           description: The Sale Record to be Created, count is the
-            number of units to be sold for the product
-           schema:
-             type: object
-             required:
-               - username
-               - password
-               - role
-             properties:
-                products:
-                  type: object
-                  properties:
-                    1:
-                      type: object
-                      properties:
-                        product_id:
-                          type: integer
-                        count:
-                          type: integer
-       responses:
-         200:
-           description: Sale Record Created Successfully
-         403:
-           description: Authorization error, displayed when
-            Admin tries to create a sale record
-            """
+        """create a new sale"""
 
         current_user = get_jwt_identity()
         user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))

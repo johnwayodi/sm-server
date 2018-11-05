@@ -1,0 +1,33 @@
+Add a new User
+This endpoint allows the creation of a new user.
+Only an Administrator can create a new user(Attendant).
+---
+tags:
+- users
+parameters:
+- in: header
+  name: Authorization
+  description: The jwt token generated during user login
+    example (Bearer eyGssads...)
+  type: string
+  required: true
+- in: body
+  name: User Details
+  description: The Details of the User to be added to the system
+  schema:
+    type: object
+    required:
+    - name
+    - password
+    properties:
+      name:
+        type: string
+      password:
+        type: string
+responses:
+  201:
+    description: Success, user created successful
+  400:
+    description: Bad Request, validation not successful
+  401:
+    description: Unauthorized, displayed to attendant trying to create a new user

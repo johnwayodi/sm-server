@@ -1,0 +1,26 @@
+Get a Single Sale Record
+Returns a sale record with the specified id.
+---
+tags:
+- sales
+parameters:
+- in: header
+  name: Authorization
+  description: The jwt token generated during
+    user login example (Bearer eyGssads...)
+  type: string
+  required: true
+- name: sale_id
+  in: path
+  type: string
+  required: true
+  description: The id of the sale records to retrieve
+responses:
+  200:
+    description: Success, Sale Record with specified id is
+      returned successfully
+  404:
+    description: Not Fouund, no sale record matches the id specified
+  400:
+    description: Bad Request validation errors, only an integer value
+      can be accepted as valid

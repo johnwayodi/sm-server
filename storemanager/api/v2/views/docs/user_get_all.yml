@@ -1,0 +1,16 @@
+Retrieve All Users
+Returns all the users present in the system
+This endpoint is only accessible by the Administrator
+---
+tags:
+- users
+parameters:
+- in: header
+  name: Authorization
+  description: The jwt token generated during user login
+    example (Bearer eyGssads...)
+  type: string
+  required: true
+responses:
+  200:
+    description: List of Users Returned Successful
