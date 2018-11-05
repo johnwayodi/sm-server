@@ -2,6 +2,7 @@
 import psycopg2
 from storemanager.api.v2.database.config import config
 from .abstract_model import AbstractModel
+from storemanager.api.v2.database.database import execute_query
 
 
 class ProductModel(AbstractModel):
@@ -32,23 +33,7 @@ class ProductModel(AbstractModel):
     @classmethod
     def update_on_sale(cls, statement, values):
         """updates stock value of product after sale"""
-        conn = None
-        rows_updated = 0
-        try:
-            params = config()
-            conn = psycopg2.connect(**params)
-            cur = conn.cursor()
-            cur.execute(statement, values)
-            rows_updated = cur.rowcount
-            conn.commit()
-            cur.close()
-        except (Exception, psycopg2.DatabaseError) as error:
-            print(error)
-        finally:
-            if conn is not None:
-                conn.close()
-
-        return rows_updated
+        execute_query([statement, values], "one_row_count")
 
     def as_dict(self):
         """Converts Product to dict() object."""
