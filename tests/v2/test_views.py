@@ -60,7 +60,7 @@ def test_admin_get_attendant(client, authorize_admin):
 
 
 def test_admin_get_attendant_not_exist(client, authorize_admin):
-    """admin should be able to view an attendant account"""
+    """admin should not be able to view a non-existent attendant account"""
     headers = authorize_admin
     expected_message = 'user with id does not exist'
 
@@ -71,7 +71,7 @@ def test_admin_get_attendant_not_exist(client, authorize_admin):
 
 
 def test_admin_get_attendant_non_integer(client, authorize_admin):
-    """admin should be able to pass a non integer value in url"""
+    """admin should not be able to pass a non integer value in url"""
     headers = authorize_admin
     expected_message = 'provided id is not an integer'
 
@@ -89,7 +89,7 @@ def test_admin_get_users(client, authorize_admin):
 
 
 def test_admin_delete_attendant_non_integer(client, authorize_admin):
-    """admin should be able to pass a non integer value in url"""
+    """admin should not be able to pass a non integer value in url"""
     headers = authorize_admin
     expected_message = 'provided id is not an integer'
 
@@ -100,7 +100,7 @@ def test_admin_delete_attendant_non_integer(client, authorize_admin):
 
 
 def test_admin_delete_attendant_non_existent(client, authorize_admin):
-    """admin should be able to delete a non existent attendant"""
+    """admin should not be able to delete a non-existent attendant"""
     headers = authorize_admin
     expected_message = 'user with id does not exist'
 
@@ -111,7 +111,7 @@ def test_admin_delete_attendant_non_existent(client, authorize_admin):
 
 
 def test_admin_delete_attendant(client, authorize_admin):
-    """admin should be able to delete a non existent attendant"""
+    """admin should be able to delete a existing attendant"""
     headers = authorize_admin
     expected_message = 'user deleted successfully'
 
