@@ -53,6 +53,7 @@ class Product(Resource):
 
         return {'product': product.as_dict()}, 200
 
+    @expects_json(PRODUCT_SCHEMA)
     @jwt_required
     @swag_from('docs/product_put.yml')
     def put(self, product_id):
@@ -66,6 +67,11 @@ class Product(Resource):
         stock = data['stock']
         min_stock = data['min_stock']
         category = data['category']
+
+        CustomValidator.validate_product_details(
+            name, price, description, category,
+            stock, min_stock
+        )
 
         p_name = name.lower().strip()
         p_cat = category.lower().strip()
@@ -109,7 +115,7 @@ class ProductList(Resource):
     @swag_from('docs/product_get_all.yml')
     def get(self):
         """get all products"""
-        products = {}
+        products = []
         result = ProductModel.get_all(GET_ALL_PRODUCTS)
         for i in range(len(result)):
             product = ProductModel()
@@ -125,8 +131,8 @@ class ProductList(Resource):
             category_name = category_details[1]
 
             product.category = category_name
-            products[i + 1] = product.as_dict()
-        if products == {}:
+            products.append(product.as_dict())
+        if not products:
             return {'message': 'no products added yet'}, 404
 
         return {'products': products}, 200

@@ -8,18 +8,8 @@ from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.utils.validators import CustomValidator
 from storemanager.api.v2.utils.custom_checks import *
 
-USER_REGISTRATION_SCHEMA = {
-    'type': 'object',
-    'maxProperties': 3,
-    'properties': {
-        'username': {'type': 'string'},
-        'password': {'type': 'string'},
-        'role': {'type': 'string'}
-    },
-    'required': ['username', 'password', 'role']
-}
 
-USER_LOGIN_SCHEMA = {
+USER_SCHEMA = {
     'type': 'object',
     'maxProperties': 2,
     'properties': {
@@ -72,7 +62,7 @@ class UserList(Resource):
     def get(self):
         """get all users"""
         check_user_admin()
-        users = {}
+        users = []
         result = UserModel.get_all(GET_ALL_USERS)
 
         for i in range(len(result)):
@@ -80,14 +70,14 @@ class UserList(Resource):
             user.id = result[i][0]
             user.username = result[i][1]
             user.role = result[i][2]
-            users[i + 1] = user.as_dict()
-        if users == {}:
+            users.append(user.as_dict())
+        if not users:
             return {'message': 'no users in system yet'}, 404
 
         return {'users': users}, 200
 
+    @expects_json(USER_SCHEMA)
     @jwt_required
-    @expects_json(USER_LOGIN_SCHEMA)
     @swag_from('docs/user_post.yml')
     def post(self):
         """add new user"""
@@ -95,8 +85,9 @@ class UserList(Resource):
         data = request.get_json()
         username = data['username']
         password = data['password']
-
+        CustomValidator.validate_login_details(username, password)
         a_name = username.lower().strip()
+
         result = UserModel.get_by_name(GET_USER_BY_NAME, (a_name,))
         if result is None:
             user = UserModel()
@@ -112,38 +103,35 @@ class UserList(Resource):
 class UserRegistration(Resource):
     """Allows registration of users"""
 
-    @expects_json(USER_REGISTRATION_SCHEMA)
+    @expects_json(USER_SCHEMA)
     @swag_from('docs/auth_register.yml')
     def post(self):
         """register a user"""
         data = request.get_json()
         username = data['username']
         password = data['password']
-        role = data['role']
+        role = "admin"
 
         u_name = username.lower().strip()
         CustomValidator.validate_register_details(u_name, password, role)
 
-        if data['role'] == 'admin' or data['role'] == 'attendant':
-            user_result = UserModel.get_by_name(GET_USER_BY_NAME, (u_name,))
-            if user_result is not None:
-                return {'message': 'User already exists'}, 400
+        user_result = UserModel.get_by_name(GET_USER_BY_NAME, (u_name,))
+        if user_result is not None:
+            return {'message': 'User already exists'}, 400
 
-            user = UserModel()
-            saved_user = user.save(CREATE_USER, (u_name, password, role))
-            user.id = saved_user[0]
-            user.username = saved_user[1]
-            user.role = saved_user[2]
-            return {'message': 'user created',
-                    'user': user.as_dict()}, 201
-
-        return {'message': 'user role must be admin or attendant'}, 400
+        user = UserModel()
+        saved_user = user.save(CREATE_USER, (u_name, password, role))
+        user.id = saved_user[0]
+        user.username = saved_user[1]
+        user.role = saved_user[2]
+        return {'message': 'user created',
+                'user': user.as_dict()}, 201
 
 
 class UserLogin(Resource):
     """Allows user who is registered to log in"""
 
-    @expects_json(USER_LOGIN_SCHEMA)
+    @expects_json(USER_SCHEMA)
     @swag_from('docs/auth_login.yml')
     def post(self):
         """login a user"""
@@ -163,6 +151,7 @@ class UserLogin(Resource):
         if user_result[1] == uname and user_result[2] == password:
             access_token = create_access_token(identity=uname)
             return {'message': 'login successful',
+                    'user_role': user_result[3],
                     'access_token': access_token}, 200
 
         if user_result[1] == uname and user_result[2] != password:

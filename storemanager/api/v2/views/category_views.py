@@ -82,7 +82,7 @@ class Categories(Resource):
     @swag_from('docs/category_get_all.yml')
     def get(self):
         check_user_admin()
-        categories = {}
+        categories = []
         result = CategoryModel.get_all(GET_ALL_CATEGORIES)
 
         for i in range(len(result)):
@@ -90,8 +90,8 @@ class Categories(Resource):
             category.id = result[i][0]
             category.name = result[i][1]
             category.description = result[i][2]
-            categories[i + 1] = category.as_dict()
-        if categories == {}:
+            categories.append(category.as_dict())
+        if not categories:
             return {'message': 'no categories added yet'}, 404
         return {'categories': categories}, 200
 

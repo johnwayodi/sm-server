@@ -3,12 +3,14 @@ from flasgger import Swagger
 
 from storemanager import create_app
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 from storemanager.api.v2.database.database import Database
 
 app = create_app("development")
 Database.drop_tables()
 Database.create_all_tables()
 jwt = JWTManager(app)
+CORS(app)
 
 template = {
     "swagger": "3.0",

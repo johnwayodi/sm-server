@@ -51,14 +51,14 @@ class SaleRecord(Resource):
         sale.attendant = sale_details[3]
         sale_products = SaleRecordModelItem.get_all_by_id(
             GET_SALE_ITEMS, (sale.id,))
-        products = {}
+        products = []
         for i in range(len(sale_products)):
             product = {
                 'name': sale_products[i][0],
                 'price': sale_products[i][1],
                 'quantity': sale_products[i][2],
                 'cost': sale_products[i][3]}
-            products[i + 1] = product
+            products.append(product)
 
         return {'id': sale.id,
                 'products': products,
@@ -74,7 +74,7 @@ class SaleRecords(Resource):
     @swag_from('docs/sale_get_all.yml')
     def get(self):
         """get all sale records"""
-        sales = {}
+        sales = []
         result = SaleRecordModel.get_all(GET_ALL_SALES)
 
         for i in range(len(result)):
@@ -83,8 +83,8 @@ class SaleRecords(Resource):
             sale.items = result[i][1]
             sale.total = result[i][2]
             sale.attendant = result[i][3]
-            sales[i + 1] = sale.as_dict()
-        if sales == {}:
+            sales.append(sale.as_dict())
+        if not sales:
             return {'message': 'no sales added yet'}, 404
 
         return {'sales': sales}, 200
