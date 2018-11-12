@@ -6,7 +6,8 @@ from flask import abort
 from flask_jwt_extended import get_jwt_identity
 
 from storemanager.api.v2.models.user import UserModel
-from storemanager.api.v2.database.queries import GET_USER_BY_NAME
+from storemanager.api.v2.database.queries import GET_USER_BY_NAME, CHECK_ADMIN_EXISTS, CHECK_TOKEN_VALIDITY
+from storemanager.api.v2.database.database import execute_query
 
 
 def check_user_admin():
@@ -20,3 +21,17 @@ def check_user_admin():
 def check_id_integer(entity_id):
     if not entity_id.isdigit():
         abort(400, 'provided id is not an integer')
+
+
+def check_admin_exists():
+    admin = execute_query([CHECK_ADMIN_EXISTS], "one_row_count")
+    if admin is not None:
+        abort(400, 'admin user already exists')
+
+
+def is_token_revoked(token):
+    result = execute_query([CHECK_TOKEN_VALIDITY, (token,)], "one")
+    if not result:
+        return False
+
+    return True

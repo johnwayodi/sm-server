@@ -1,8 +1,7 @@
 import json
 import pytest
-from storemanager import create_app
+from run import app
 from tests.v2.sample_data import *
-from flask_jwt_extended import JWTManager
 
 
 @pytest.fixture
@@ -10,10 +9,8 @@ def client():
     """
     Returns app to be used in testing api routes
     """
-    testing_app = create_app("testing")
-    client = testing_app.test_client()
-    jwt = JWTManager(testing_app)
-    ctx = testing_app.app_context()
+    client = app.test_client()
+    ctx = app.app_context()
     ctx.push()
     yield client
     ctx.pop()

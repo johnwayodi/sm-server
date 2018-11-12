@@ -1,0 +1,20 @@
+Log out User
+This endpoint allows a user to log out of the application.
+Both the Administrator and Attendant use this endpoint.
+Log out adds the access token of the user to the blacklist so that it cannot be used
+to access pages after user logs out.
+---
+tags:
+- auth
+parameters:
+- in: header
+  name: Authorization
+  description: The jwt token generated during user
+    login example (Bearer eyGssads...)
+  type: string
+  required: true
+responses:
+  200:
+    description: Success, logout successful, token has been added to the blacklist
+  400:
+    description: Bad Request, validation check failed.
