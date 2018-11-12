@@ -149,7 +149,7 @@ class UserLogin(Resource):
             return {'message': 'user does not exist'}, 404
 
         if user_result[1] == uname and user_result[2] == password:
-            access_token = create_access_token(identity=uname)
+            access_token = create_access_token(identity=uname, expires_delta=False)
             return {'message': 'login successful',
                     'user_role': user_result[3],
                     'access_token': access_token}, 200

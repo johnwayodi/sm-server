@@ -740,26 +740,26 @@ def test_attendant_get_single_sale(client, authorize_attendant):
     headers = authorize_attendant
     expected_result = {
         "id": 2,
-        "products": {
-            "1": {
+        "products": [
+            {
                 "name": "table",
                 "price": 10000,
                 "quantity": 2,
                 "cost": 20000
             },
-            "2": {
+            {
                 "name": "phone",
                 "price": 20000,
                 "quantity": 2,
                 "cost": 40000
             },
-            "3": {
+            {
                 "name": "couch",
                 "price": 50000,
                 "quantity": 10,
                 "cost": 500000
             }
-        },
+        ],
         "items": 14,
         "total": 560000,
         "attendant_id": 4
@@ -789,26 +789,26 @@ def test_admin_get_single_sale(client, authorize_admin):
     headers = authorize_admin
     expected_result = {
         "id": 2,
-        "products": {
-            "1": {
+        "products": [
+            {
                 "name": "table",
                 "price": 10000,
                 "quantity": 2,
                 "cost": 20000
             },
-            "2": {
+            {
                 "name": "phone",
                 "price": 20000,
                 "quantity": 2,
                 "cost": 40000
             },
-            "3": {
+            {
                 "name": "couch",
                 "price": 50000,
                 "quantity": 10,
                 "cost": 500000
             }
-        },
+        ],
         "items": 14,
         "total": 560000,
         "attendant_id": 4

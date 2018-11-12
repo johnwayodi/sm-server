@@ -49,12 +49,13 @@ def authorize_admin(client):
 
 
 @pytest.fixture
-def authorize_attendant(client):
+def authorize_attendant(client, authorize_admin):
+    headers = authorize_admin
     """
         Registers and signs in user with role attendant.
         Returns header to be used in testing attendant
         """
-    client.post('/auth/register', data=json.dumps(USERS['user1']), headers=HEADERS)
+    client.post('/api/v2/users', data=json.dumps(USERS['user1']), headers=headers)
 
     user = USERS['user1']
     username = user['username']

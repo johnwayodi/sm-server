@@ -246,23 +246,19 @@ SALE_RECORDS = {
 USERS = {
     "user1": {
         "username": "jack",
-        "password": "tester",
-        "role": "attendant"
+        "password": "tester"
     },
     "user2": {
         "username": "abraham",
-        "password": "lincoln",
-        "role": "admin"
+        "password": "lincoln"
     },
     "user3": {
         "username": "jacky",
-        "password": "testerin",
-        "role": "attendant"
+        "password": "testerin"
     },
     "user4": {
         "username": "walulu",
-        "password": "testiod",
-        "role": "attendant"
+        "password": "testiod"
     }
 
 }
