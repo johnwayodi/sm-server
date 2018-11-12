@@ -820,3 +820,29 @@ def test_admin_get_single_sale(client, authorize_admin):
 
     assert response.status_code == 200
     assert data == expected_result
+
+
+def test_admin_log_out(client, authorize_admin):
+    """admin should be able to log out"""
+    headers = authorize_admin
+    expected_message = 'logout successful'
+
+    response = client.delete('/auth/logout', headers=headers)
+
+    data = response.json
+
+    assert response.status_code == 200
+    assert data['message'] == expected_message
+
+
+def test_attendant_log_out(client, authorize_attendant):
+    """admin should be able to log out"""
+    headers = authorize_attendant
+    expected_message = 'logout successful'
+
+    response = client.delete('/auth/logout', headers=headers)
+
+    data = response.json
+
+    assert response.status_code == 200
+    assert data['message'] == expected_message

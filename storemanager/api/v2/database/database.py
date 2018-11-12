@@ -24,7 +24,8 @@ class Database:
             CREATE_TABLE_CATEGORIES,
             CREATE_TABLE_PRODUCTS,
             CREATE_TABLE_SALES,
-            CREATE_TABLE_SALE_ITEMS
+            CREATE_TABLE_SALE_ITEMS,
+            CREATE_TOKENS_TABLE
         ]
 
         for statement in create_tables_query:

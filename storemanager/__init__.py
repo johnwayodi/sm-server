@@ -12,6 +12,8 @@ def create_app(config_name):
     app.config.from_object(APP_CONFIG[config_name])
     app.config.from_pyfile('config.py')
     app.config['PROPAGATE_EXCEPTIONS'] = True
+    app.config['JWT_BLACKLIST_ENABLED'] = True
+    app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access']
     app.register_blueprint(api_blueprint)
     app.register_blueprint(auth_blueprint)
     return app

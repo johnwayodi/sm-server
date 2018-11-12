@@ -25,3 +25,4 @@ api.add_resource(Categories, '/categories')
 
 auth_api.add_resource(UserRegistration, '/register')
 auth_api.add_resource(UserLogin, '/login')
+auth_api.add_resource(UserLogout, '/logout')

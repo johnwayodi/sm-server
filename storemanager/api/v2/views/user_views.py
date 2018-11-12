@@ -1,12 +1,13 @@
 from flask import request, abort
 from flask_expects_json import expects_json
-from flask_jwt_extended import jwt_required, create_access_token
+from flask_jwt_extended import jwt_required, create_access_token, get_raw_jwt
 from flask_restful import Resource
 from flasgger import swag_from
 
 from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.utils.validators import CustomValidator
 from storemanager.api.v2.utils.custom_checks import *
+from storemanager.api.v2.database.database import execute_query
 
 
 USER_SCHEMA = {
@@ -107,6 +108,7 @@ class UserRegistration(Resource):
     @swag_from('docs/auth_register.yml')
     def post(self):
         """register a user"""
+        check_admin_exists()
         data = request.get_json()
         username = data['username']
         password = data['password']
@@ -157,3 +159,15 @@ class UserLogin(Resource):
         if user_result[1] == uname and user_result[2] != password:
             return {'message': 'wrong username or password, '
                                'Try Again'}, 400
+
+
+class UserLogout(Resource):
+    """Allows user to log out of application"""
+
+    @jwt_required
+    @swag_from('docs/auth_logout.yml')
+    def delete(self):
+        """logout a user"""
+        token = get_raw_jwt()['jti']
+        execute_query([REVOKE_TOKEN, (token,)], "one")
+        return {"message": "logout successful"}, 200
