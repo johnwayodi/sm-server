@@ -4,7 +4,6 @@ from flask_jwt_extended import jwt_required
 from flask_restful import Resource
 from flasgger import swag_from
 
-from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.models.category import CategoryModel
 from storemanager.api.v2.utils.validators import CustomValidator
 from storemanager.api.v2.utils.custom_checks import *

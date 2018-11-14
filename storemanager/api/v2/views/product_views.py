@@ -1,12 +1,10 @@
-from flask import request, abort
+from flask import request
 from flask_expects_json import expects_json
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource
 from flasgger import swag_from
 
-from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.models.category import CategoryModel
-from storemanager.api.v2.models.product import ProductModel
 from storemanager.api.v2.utils.validators import CustomValidator
 from storemanager.api.v2.utils.custom_checks import *
 from storemanager.api.v2.utils.converters import date_to_string
@@ -55,8 +53,8 @@ class Product(Resource):
 
         return {'product': product.as_dict()}, 200
 
-    @expects_json(PRODUCT_SCHEMA)
     @jwt_required
+    @expects_json(PRODUCT_SCHEMA)
     @swag_from('docs/product_put.yml')
     def put(self, product_id):
         """update a product"""

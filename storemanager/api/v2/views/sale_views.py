@@ -107,7 +107,6 @@ class SaleRecords(Resource):
         total_cost = 0
         items_count = 0
         products = []
-
         items = data['products']
 
         for i in range(len(items)):
@@ -126,9 +125,21 @@ class SaleRecords(Resource):
                         'reason': 'product named {} does '
                                   'not exist'.format(p_name)}, 400
 
+        for i in range(len(items)):
+            product_name = items[i]['name']
+            quantity_in_cart = items[i]['count']
+
+            p_name = product_name.lower().strip()
+
+            CustomValidator.validate_sale_items(
+                p_name, quantity_in_cart)
+
+            product = ProductModel.get_by_name(
+                GET_PRODUCT_BY_NAME, (p_name,))
+
             product_price = product[2]
             cost = product_price * quantity_in_cart
-            if product[3] - quantity_in_cart < product[4]:
+            if product[3] - quantity_in_cart < 0:
                 return {'message': 'failed to create sale record',
                         'reason': 'cannot sell past minimum '
                                   'stock for {}'.format(p_name)}, 400
