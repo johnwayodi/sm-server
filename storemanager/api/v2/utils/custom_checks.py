@@ -6,7 +6,6 @@ from flask import abort
 from flask_jwt_extended import get_jwt_identity
 
 from storemanager.api.v2.models.user import UserModel
-from storemanager.api.v2.models.product import ProductModel
 from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.database.database import execute_query
 

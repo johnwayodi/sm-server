@@ -98,7 +98,6 @@ class SaleRecords(Resource):
     @swag_from('docs/sale_post.yml')
     def post(self):
         """create a new sale"""
-
         current_user = get_jwt_identity()
         user_details = UserModel.get_by_name(GET_USER_BY_NAME, (current_user,))
         if user_details[3] != "attendant":
@@ -125,6 +124,13 @@ class SaleRecords(Resource):
                         'reason': 'product named {} does '
                                   'not exist'.format(p_name)}, 400
 
+            # product_price = product[2]
+            # cost = product_price * quantity_in_cart
+            if product[3] - quantity_in_cart < 0:
+                return {'message': 'failed to create sale record',
+                        'reason': 'cannot sell past minimum '
+                                  'stock for {}'.format(p_name)}, 400
+
         for i in range(len(items)):
             product_name = items[i]['name']
             quantity_in_cart = items[i]['count']
@@ -139,10 +145,6 @@ class SaleRecords(Resource):
 
             product_price = product[2]
             cost = product_price * quantity_in_cart
-            if product[3] - quantity_in_cart < 0:
-                return {'message': 'failed to create sale record',
-                        'reason': 'cannot sell past minimum '
-                                  'stock for {}'.format(p_name)}, 400
 
             new_stock_value = product[3] - quantity_in_cart
             ProductModel.update_on_sale(
