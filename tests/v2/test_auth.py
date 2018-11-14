@@ -5,16 +5,16 @@ from run import app
 from tests.v2.sample_data import USERS, HEADERS
 
 
-@pytest.fixture
-def auth_client():
-    """
-    Returns app to be used in testing api routes
-    """
-    client = app.test_client()
-    ctx = app.app_context()
-    ctx.push()
-    yield client
-    ctx.pop()
+# @pytest.fixture
+# def auth_client():
+#     """
+#     Returns app to be used in testing api routes
+#     """
+#     client = app.test_client()
+#     ctx = app.app_context()
+#     ctx.push()
+#     yield client
+#     ctx.pop()
 
 
 def test_registration(auth_client):

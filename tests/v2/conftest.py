@@ -1,19 +1,36 @@
 import json
 import pytest
-from run import app
+from storemanager import create_app
+from storemanager.api.v2.database.database import DB
 from tests.v2.sample_data import *
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def client():
     """
     Returns app to be used in testing api routes
     """
+    app = create_app("testing")
     client = app.test_client()
     ctx = app.app_context()
     ctx.push()
     yield client
     ctx.pop()
+    DB.drop_tables()
+
+
+@pytest.fixture(scope="session")
+def auth_client():
+    """
+    Returns app to be used in testing authentication api routes
+    """
+    app = create_app("testing")
+    client = app.test_client()
+    ctx = app.app_context()
+    ctx.push()
+    yield client
+    ctx.pop()
+    DB.drop_tables()
 
 
 @pytest.fixture

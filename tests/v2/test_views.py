@@ -3,7 +3,12 @@ Module containing tests for the various endpoints.
 Contains tests for both Admin User and Attendant.
 """
 import json
+from datetime import date
+from storemanager.api.v2.utils.converters import date_to_string
 from tests.v2.sample_data import *
+
+date_object = date.today()
+date_created = date_to_string(date_object)
 
 
 def test_admin_add_attendant(client, authorize_admin):
@@ -138,7 +143,8 @@ def test_admin_add_category(client, authorize_admin):
     expected_result = {
         "id": 1,
         "name": "furniture",
-        "description": "this is the furniture category"
+        "description": "this is the furniture category",
+        "date_created": date_created
     }
 
     response = client.post('/api/v2/categories',
@@ -202,7 +208,8 @@ def test_admin_get_category(client, authorize_admin):
     expected_result = {
         "id": 1,
         "name": "furniture",
-        "description": "this is the furniture category"
+        "description": "this is the furniture category",
+        "date_created": date_created
     }
 
     response = client.get('/api/v2/categories/{:d}'.format(1), headers=headers)
@@ -269,7 +276,8 @@ def test_admin_add_product(client, authorize_admin):
         'description': 'a cool table',
         'category': 'furniture',
         'stock': 100,
-        'min_stock': 10
+        'min_stock': 10,
+        'date_created': date_created
     }
 
     response = client.post('/api/v2/products',
@@ -405,7 +413,8 @@ def test_admin_get_one_product(client, authorize_admin):
         'description': 'a cool television',
         'category': 'electronics',
         'stock': 200,
-        'min_stock': 20
+        'min_stock': 20,
+        'date_created': date_created
     }
 
     response = client.get('/api/v2/products/{:d}'.format(3), headers=headers)
@@ -640,7 +649,8 @@ def test_attendant_get_one_product(client, authorize_attendant):
         'price': 30000,
         'category': 'electronics',
         'stock': 200,
-        'min_stock': 20
+        'min_stock': 20,
+        'date_created': date_created
     }
 
     response = client.get('/api/v2/products/{:d}'.format(3), headers=headers)
@@ -762,7 +772,8 @@ def test_attendant_get_single_sale(client, authorize_attendant):
         ],
         "items": 14,
         "total": 560000,
-        "attendant_id": 4
+        "attendant_id": 4,
+        "date_created": date_created
     }
 
     response = client.get('/api/v2/sales/{:d}'.format(2), headers=headers)
@@ -811,7 +822,8 @@ def test_admin_get_single_sale(client, authorize_admin):
         ],
         "items": 14,
         "total": 560000,
-        "attendant_id": 4
+        "attendant_id": 4,
+        "date_created": date_created
     }
 
     response = client.get('/api/v2/sales/{:d}'.format(2), headers=headers)
