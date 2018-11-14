@@ -10,6 +10,7 @@ from storemanager.api.v2.models.sale_record import *
 from storemanager.api.v2.models.user import UserModel
 from storemanager.api.v2.utils.validators import CustomValidator
 from storemanager.api.v2.utils.custom_checks import check_id_integer
+from storemanager.api.v2.utils.converters import date_to_string
 
 SALES_SCHEMA = {
     "type": "object",
@@ -49,6 +50,7 @@ class SaleRecord(Resource):
         sale.items = sale_details[1]
         sale.total = sale_details[2]
         sale.attendant = sale_details[3]
+        sale.created = date_to_string(sale_details[4])
         sale_products = SaleRecordModelItem.get_all_by_id(
             GET_SALE_ITEMS, (sale.id,))
         products = []
@@ -64,7 +66,8 @@ class SaleRecord(Resource):
                 'products': products,
                 'items': sale.items,
                 'total': sale.total,
-                'attendant_id': sale.attendant}, 200
+                'attendant_id': sale.attendant,
+                'date_created': sale.created}, 200
 
 
 class SaleRecords(Resource):
@@ -83,6 +86,7 @@ class SaleRecords(Resource):
             sale.items = result[i][1]
             sale.total = result[i][2]
             sale.attendant = result[i][3]
+            sale.created = date_to_string(result[i][4])
             sales.append(sale.as_dict())
         if not sales:
             return {'message': 'no sales added yet'}, 404
@@ -151,6 +155,7 @@ class SaleRecords(Resource):
         sale.attendant = attendant_id
         result = sale.save(CREATE_SALE, (items_count, total_cost, attendant_id))
         sale.id = result[0]
+        sale.created = date_to_string(result[4])
 
         products_in_sale = []
         for i in range(len(products)):

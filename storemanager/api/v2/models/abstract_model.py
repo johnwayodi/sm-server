@@ -10,6 +10,7 @@ class AbstractModel:
 
     def __init__(self):
         self.id = int
+        self.created = str
 
     def save(self, statement, values):
         """create a new item using the entity details specified"""

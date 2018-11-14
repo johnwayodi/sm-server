@@ -4,51 +4,56 @@ that are used in the application
 """
 
 CREATE_TABLE_USERS = """
-    CREATE TABLE USERS (
+    CREATE TABLE IF NOT EXISTS USERS (
     ID SERIAL PRIMARY KEY,
     NAME VARCHAR(50) NOT NULL,
     ROLE VARCHAR(10) NOT NULL,
-    PASSWORD VARCHAR(60) NOT NULL
+    PASSWORD VARCHAR(60) NOT NULL,
+    DATE_CREATED DATE NOT NULL DEFAULT CURRENT_DATE
     );"""
 
 CREATE_TABLE_CATEGORIES = """
-    CREATE TABLE CATEGORIES (
+    CREATE TABLE IF NOT EXISTS CATEGORIES (
     ID SERIAL PRIMARY KEY,
     NAME VARCHAR(50) NOT NULL,
-    DESCRIPTION TEXT
+    DESCRIPTION TEXT,
+    DATE_CREATED DATE NOT NULL DEFAULT CURRENT_DATE
     );"""
 
 CREATE_TABLE_PRODUCTS = """
-    CREATE TABLE PRODUCTS (
+    CREATE TABLE IF NOT EXISTS PRODUCTS (
     ID SERIAL PRIMARY KEY,
     NAME VARCHAR(50) NOT NULL,
     PRICE INTEGER NOT NULL,
     STOCK INTEGER NOT NULL,
     STOCKMIN INTEGER NOT NULL,
     DESCRIPTION TEXT NOT NULL,
+    DATE_CREATED DATE NOT NULL DEFAULT CURRENT_DATE,
     CATEGORY INTEGER REFERENCES CATEGORIES (ID)
     );"""
 
 CREATE_TABLE_SALES = """
-    CREATE TABLE SALE_RECORDS (
+    CREATE TABLE IF NOT EXISTS SALE_RECORDS (
     ID SERIAL PRIMARY KEY,
     ITEMS INTEGER NOT NULL,
     TOTAL INTEGER NOT NULL,
+    DATE_CREATED DATE NOT NULL DEFAULT CURRENT_DATE,
     ATTENDANT_ID INTEGER REFERENCES USERS (ID)
     );"""
 
 CREATE_TABLE_SALE_ITEMS = """
-    CREATE TABLE SALE_RECORD_ITEMS (
+    CREATE TABLE IF NOT EXISTS SALE_RECORD_ITEMS (
     ID SERIAL PRIMARY KEY,
     PRODUCT_NAME TEXT NOT NULL,
     PRICE INTEGER NOT NULL,
     QUANTITY INTEGER NOT NULL,
     TOTAL INTEGER NOT NULL,
+    DATE_CREATED DATE NOT NULL DEFAULT CURRENT_DATE,
     SALE_ID INTEGER REFERENCES SALE_RECORDS (ID)
     );"""
 
 CREATE_TOKENS_TABLE = """
-    CREATE TABLE TOKENS (
+    CREATE TABLE IF NOT EXISTS TOKENS (
     ID SERIAL PRIMARY KEY,
     TOKEN VARCHAR(100) NOT NULL
     );"""
@@ -60,10 +65,10 @@ DROP_ALL_TABLES = """
 CREATE_CATEGORY = """
     INSERT INTO categories(name, description)
     VALUES(%s, %s)
-    RETURNING id, name, description;"""
+    RETURNING id, name, description, date_created;"""
 
 GET_CATEGORY = """
-    SELECT id, name, description
+    SELECT id, name, description, date_created
     FROM categories
     WHERE id = %s"""
 
@@ -82,14 +87,14 @@ UPDATE_CATEGORY = """
     WHERE id = %s"""
 
 GET_ALL_CATEGORIES = """
-    SELECT id, name, description
+    SELECT id, name, description, date_created
     FROM categories
     ORDER BY id"""
 
 CREATE_PRODUCT = """
     INSERT INTO products(name, price, stock, stockmin, description, category)
     VALUES(%s, %s, %s,%s, %s, %s)
-    RETURNING id, name, description, price, stock, stockmin, category;"""
+    RETURNING id, name, description, price, stock, stockmin, date_created, category;"""
 
 GET_PRODUCT = """
     SELECT * FROM products
@@ -121,20 +126,20 @@ GET_ALL_PRODUCTS = """
 CREATE_SALE = """
     INSERT INTO sale_records(items, total, attendant_id)
     VALUES(%s, %s, %s)
-    RETURNING id, items, total, attendant_id;"""
+    RETURNING id, items, total, attendant_id, date_created;"""
 
 GET_SALE = """
-    SELECT id, items, total, attendant_id
+    SELECT id, items, total, attendant_id, date_created
     FROM sale_records
     WHERE id = %s"""
 
 GET_ALL_SALES = """
-    SELECT id, items, total, attendant_id
+    SELECT id, items, total, attendant_id, date_created
     FROM sale_records
     ORDER BY id"""
 
 GET_ALL_SALES_BY_ATTENDANT = """
-    SELECT id, items, total, attendant_id
+    SELECT id, items, total, attendant_id, date_created
     FROM sale_records
     WHERE attendant_id = %s
     ORDER BY id"""
