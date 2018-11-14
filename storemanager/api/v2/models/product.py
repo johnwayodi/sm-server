@@ -1,6 +1,4 @@
 """ This module contains the Product model."""
-import psycopg2
-from storemanager.api.v2.database.config import config
 from .abstract_model import AbstractModel
 from storemanager.api.v2.database.database import execute_query
 
@@ -43,4 +41,5 @@ class ProductModel(AbstractModel):
                 'description': self.description,
                 'category': self.category,
                 'stock': self.stock,
-                'min_stock': self.min_stock}
+                'min_stock': self.min_stock,
+                'date_created': self.created}

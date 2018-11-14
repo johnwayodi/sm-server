@@ -1,22 +1,36 @@
 import json
 import pytest
 from storemanager import create_app
+from storemanager.api.v2.database.database import DB
 from tests.v2.sample_data import *
-from flask_jwt_extended import JWTManager
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def client():
     """
     Returns app to be used in testing api routes
     """
-    testing_app = create_app("testing")
-    client = testing_app.test_client()
-    jwt = JWTManager(testing_app)
-    ctx = testing_app.app_context()
+    app = create_app("testing")
+    client = app.test_client()
+    ctx = app.app_context()
     ctx.push()
     yield client
     ctx.pop()
+    DB.drop_tables()
+
+
+@pytest.fixture(scope="session")
+def auth_client():
+    """
+    Returns app to be used in testing authentication api routes
+    """
+    app = create_app("testing")
+    client = app.test_client()
+    ctx = app.app_context()
+    ctx.push()
+    yield client
+    ctx.pop()
+    DB.drop_tables()
 
 
 @pytest.fixture
@@ -49,12 +63,13 @@ def authorize_admin(client):
 
 
 @pytest.fixture
-def authorize_attendant(client):
+def authorize_attendant(client, authorize_admin):
+    headers = authorize_admin
     """
         Registers and signs in user with role attendant.
         Returns header to be used in testing attendant
         """
-    client.post('/auth/register', data=json.dumps(USERS['user1']), headers=HEADERS)
+    client.post('/api/v2/users', data=json.dumps(USERS['user1']), headers=headers)
 
     user = USERS['user1']
     username = user['username']

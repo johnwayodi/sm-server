@@ -27,7 +27,8 @@ class SaleRecordModel(AbstractModel):
         return {'id': self.id,
                 'items': self.items,
                 'total': self.total,
-                'attendant_id': self.attendant}
+                'attendant_id': self.attendant,
+                'date_created': self.created}
 
 
 class SaleRecordModelItem(AbstractModel):

@@ -10,6 +10,7 @@ from storemanager.api.v2.models.sale_record import *
 from storemanager.api.v2.models.user import UserModel
 from storemanager.api.v2.utils.validators import CustomValidator
 from storemanager.api.v2.utils.custom_checks import check_id_integer
+from storemanager.api.v2.utils.converters import date_to_string
 
 SALES_SCHEMA = {
     "type": "object",
@@ -49,22 +50,24 @@ class SaleRecord(Resource):
         sale.items = sale_details[1]
         sale.total = sale_details[2]
         sale.attendant = sale_details[3]
+        sale.created = date_to_string(sale_details[4])
         sale_products = SaleRecordModelItem.get_all_by_id(
             GET_SALE_ITEMS, (sale.id,))
-        products = {}
+        products = []
         for i in range(len(sale_products)):
             product = {
                 'name': sale_products[i][0],
                 'price': sale_products[i][1],
                 'quantity': sale_products[i][2],
                 'cost': sale_products[i][3]}
-            products[i + 1] = product
+            products.append(product)
 
         return {'id': sale.id,
                 'products': products,
                 'items': sale.items,
                 'total': sale.total,
-                'attendant_id': sale.attendant}, 200
+                'attendant_id': sale.attendant,
+                'date_created': sale.created}, 200
 
 
 class SaleRecords(Resource):
@@ -74,7 +77,7 @@ class SaleRecords(Resource):
     @swag_from('docs/sale_get_all.yml')
     def get(self):
         """get all sale records"""
-        sales = {}
+        sales = []
         result = SaleRecordModel.get_all(GET_ALL_SALES)
 
         for i in range(len(result)):
@@ -83,8 +86,9 @@ class SaleRecords(Resource):
             sale.items = result[i][1]
             sale.total = result[i][2]
             sale.attendant = result[i][3]
-            sales[i + 1] = sale.as_dict()
-        if sales == {}:
+            sale.created = date_to_string(result[i][4])
+            sales.append(sale.as_dict())
+        if not sales:
             return {'message': 'no sales added yet'}, 404
 
         return {'sales': sales}, 200
@@ -103,7 +107,6 @@ class SaleRecords(Resource):
         total_cost = 0
         items_count = 0
         products = []
-
         items = data['products']
 
         for i in range(len(items)):
@@ -122,9 +125,21 @@ class SaleRecords(Resource):
                         'reason': 'product named {} does '
                                   'not exist'.format(p_name)}, 400
 
+        for i in range(len(items)):
+            product_name = items[i]['name']
+            quantity_in_cart = items[i]['count']
+
+            p_name = product_name.lower().strip()
+
+            CustomValidator.validate_sale_items(
+                p_name, quantity_in_cart)
+
+            product = ProductModel.get_by_name(
+                GET_PRODUCT_BY_NAME, (p_name,))
+
             product_price = product[2]
             cost = product_price * quantity_in_cart
-            if product[3] - quantity_in_cart < product[4]:
+            if product[3] - quantity_in_cart < 0:
                 return {'message': 'failed to create sale record',
                         'reason': 'cannot sell past minimum '
                                   'stock for {}'.format(p_name)}, 400
@@ -151,6 +166,7 @@ class SaleRecords(Resource):
         sale.attendant = attendant_id
         result = sale.save(CREATE_SALE, (items_count, total_cost, attendant_id))
         sale.id = result[0]
+        sale.created = date_to_string(result[4])
 
         products_in_sale = []
         for i in range(len(products)):

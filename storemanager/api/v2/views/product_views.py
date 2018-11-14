@@ -1,14 +1,13 @@
-from flask import request, abort
+from flask import request
 from flask_expects_json import expects_json
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource
 from flasgger import swag_from
 
-from storemanager.api.v2.database.queries import *
 from storemanager.api.v2.models.category import CategoryModel
-from storemanager.api.v2.models.product import ProductModel
 from storemanager.api.v2.utils.validators import CustomValidator
 from storemanager.api.v2.utils.custom_checks import *
+from storemanager.api.v2.utils.converters import date_to_string
 
 PRODUCT_SCHEMA = {
     'type': 'object',
@@ -45,15 +44,17 @@ class Product(Resource):
         product.stock = result[3]
         product.min_stock = result[4]
         product.description = result[5]
+        product.created = date_to_string(result[6])
 
         category_details = CategoryModel.get_by_id(
-            GET_CATEGORY, (result[6],))
+            GET_CATEGORY, (result[7],))
         category_name = category_details[1]
         product.category = category_name
 
         return {'product': product.as_dict()}, 200
 
     @jwt_required
+    @expects_json(PRODUCT_SCHEMA)
     @swag_from('docs/product_put.yml')
     def put(self, product_id):
         """update a product"""
@@ -66,6 +67,11 @@ class Product(Resource):
         stock = data['stock']
         min_stock = data['min_stock']
         category = data['category']
+
+        CustomValidator.validate_product_details(
+            name, price, description, category,
+            stock, min_stock
+        )
 
         p_name = name.lower().strip()
         p_cat = category.lower().strip()
@@ -109,7 +115,7 @@ class ProductList(Resource):
     @swag_from('docs/product_get_all.yml')
     def get(self):
         """get all products"""
-        products = {}
+        products = []
         result = ProductModel.get_all(GET_ALL_PRODUCTS)
         for i in range(len(result)):
             product = ProductModel()
@@ -119,14 +125,14 @@ class ProductList(Resource):
             product.stock = result[i][3]
             product.min_stock = result[i][4]
             product.description = result[i][5]
-
+            product.created = date_to_string(result[i][6])
             category_details = CategoryModel.get_by_id(
-                GET_CATEGORY, (result[i][6],))
+                GET_CATEGORY, (result[i][7],))
             category_name = category_details[1]
 
             product.category = category_name
-            products[i + 1] = product.as_dict()
-        if products == {}:
+            products.append(product.as_dict())
+        if not products:
             return {'message': 'no products added yet'}, 404
 
         return {'products': products}, 200
@@ -176,9 +182,10 @@ class ProductList(Resource):
         product.price = result[3]
         product.stock = result[4]
         product.min_stock = result[5]
+        product.created = date_to_string(result[6])
 
         category_details = CategoryModel.get_by_id(
-            GET_CATEGORY, (result[6],))
+            GET_CATEGORY, (result[7],))
         category_name = category_details[1]
         product.category = category_name
 

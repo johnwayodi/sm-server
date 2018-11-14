@@ -38,5 +38,6 @@ class CategoryModel(AbstractModel):
         """Converts Category to dict() object."""
         return {'id': self.id,
                 'name': self.name,
-                'description': self.description
+                'description': self.description,
+                'date_created': self.created
                 }

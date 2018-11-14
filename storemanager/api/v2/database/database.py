@@ -10,9 +10,9 @@ result = None
 class Database:
 
     def connect(self):
-        # params = config()
-        # conn = psycopg2.connect(**params)
-        conn = psycopg2.connect(os.environ['DATABASE_URL'], sslmode='require')
+        params = config()
+        conn = psycopg2.connect(**params)
+        # conn = psycopg2.connect(os.environ['DATABASE_URL'], sslmode='require')
 
         return conn
 
@@ -24,7 +24,8 @@ class Database:
             CREATE_TABLE_CATEGORIES,
             CREATE_TABLE_PRODUCTS,
             CREATE_TABLE_SALES,
-            CREATE_TABLE_SALE_ITEMS
+            CREATE_TABLE_SALE_ITEMS,
+            CREATE_TOKENS_TABLE
         ]
 
         for statement in create_tables_query:
