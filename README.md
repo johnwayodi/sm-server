@@ -31,21 +31,22 @@ running the following command:
 Once virtual environment is installed, create a new virtual environment named *venv*
     
     `virtualenv venv`
-4. Once the virtual environment is created, activate it using the following command: 
+4. Activate the created virtual environment and install all the packages for use in the app,
+   
+   The packages used by the flask app are contained in a `requirements.txt` file: 
     
-    `source venv/bin/activate`  
-5. Once the virtualenv is activated, the **requirements.txt** file contains the various requirements.
-Run the following command to install all the requirements for the application.
+    `source venv/bin/activate` 
     
     `pip install -r requirements.txt` 
 6. Set up the environment variables, 
     
-        export JWT_SECRET_KEY=""
-        export API_SECRET_KEY=""
-        export DATABASE_NAME=""
-        export DATABASE_HOST=""
-        export DATABASE_USER=""
-        export DATABASE_PASS=""
+        export JWT_SECRET_KEY="your jwt secret key"
+        export API_SECRET_KEY="your secret key"
+        export DATABASE_NAME="name of database"
+        export DATABASE_HOST="database host"
+        export DATABASE_USER="database username"
+        export DATABASE_PASS="database password"
+        export FLASK_APP=run.py
 
 7. After all is set, run the application, export the application and pass the following command:
         
@@ -53,18 +54,26 @@ Run the following command to install all the requirements for the application.
 ## Endpoints
 The API exposes the following endpoints:
 1. #### Auth Endpoints
-    The `/auth` endpoint allow the registration of users and a login route to allow registered
-    users to log into the application 
+    The `/auth` endpoint allow the registration of users and a login route to allow registered.
+    users to log into the application
+    
+    The users can also logout of the application, doing so will revoke their access token and to access the 
+    the protected endpoinnts they'll have to login again. 
     <table style="width:100%">
       <tr>
         <td>POST</td>
         <td>/auth/register</td>
-        <td>Register new user, only admin user can register</td>
+        <td>Register new user, first user to register will automatically be the Admin</td>
       </tr>
       <tr>
         <td>POST</td>
         <td>/auth/login</td>
-        <td>Users can login to the system, only successful when users are in the database</td>
+        <td>Users can login to the system</td>
+      </tr>
+      <tr>
+        <td>DELETE</td>
+        <td>/auth/logout</td>
+        <td>Users can logout of the system</td>
       </tr>
     </table>
 
@@ -179,6 +188,7 @@ The following software tools were used in the development of this application:
 6. [Pylint](https://www.pylint.org/): For code analysis.
 7. [Postman](https://www.getpostman.com/): For Manual Testing and generation of Documentation.
 8. [PostgreSQL](https://www.postgresql.org/): Database.
+9. [Travis CI](https://travis-ci.org/): Continuous integration and Build tool.
 
 ##### Contributors
 [John Wayodi](https://github.com/johnwayodi)
