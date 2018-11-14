@@ -11,8 +11,8 @@ parameters:
   required: true
 responses:
   200:
-    description: Success, User deleted successfully
+    description: Success, Category with id specified is returned
   401:
-    description: Unauthorized, Displayed to Attendant trying to delete product
+    description: Unauthorized, Displayed to Attendant trying to access this endpoint
   404:
-    description: Not Found, No user is found with specified id
+    description: Not Found, No category is found with specified id
