@@ -13,7 +13,7 @@ before_script:
 - ./cc-test-reporter before-build
 - psql -c 'create database STORE_DB;' -U postgres
 script:
-- pytest -vv --cov=storemanager/api/v2
+- pytest -vv --cov=storemanager/api/v2 -p no:warnings
 
 after_success:
 - coveralls
