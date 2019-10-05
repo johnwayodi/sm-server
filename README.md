@@ -180,19 +180,11 @@ The API exposes the following endpoints:
 ## Technologies used
 The following software tools were used in the development of this application:
 1. [Python](https://www.python.org/): Programming language.
-1. [Flask](http://flask.pocoo.org/): The underlying web framework.
-2. [Flask-RESTful](https://flask-restful.readthedocs.io/en/latest/): For the development of the API.
-3. [Flasgger](https://github.com/rochacbruno/flasgger): For the generation of the API Docs. 
-4. [Pytest](https://docs.pytest.org/en/latest/): For testing and debugging.
-5. [Coveralls](https://coveralls.io/) and [Code Climate](https://codeclimate.com/): For tracking and covering of testing. 
-6. [Pylint](https://www.pylint.org/): For code analysis.
-7. [Postman](https://www.getpostman.com/): For Manual Testing and generation of Documentation.
-8. [PostgreSQL](https://www.postgresql.org/): Database.
-9. [Travis CI](https://travis-ci.org/): Continuous integration and Build tool.
+2. [Flask](http://flask.pocoo.org/): The underlying web framework.
+3. [Flask-RESTful](https://flask-restful.readthedocs.io/en/latest/): For the development of the API.
+4. [Flasgger](https://github.com/rochacbruno/flasgger): For the generation of the API Docs. 
+5. [Pytest](https://docs.pytest.org/en/latest/): For testing and debugging.
+6. [PostgreSQL](https://www.postgresql.org/): Database.
 
 ##### Contributors
 [John Wayodi](https://github.com/johnwayodi)
-
-##### Acknowledgments
-
-The development of this software was done with the support of [Andela](https://andela.com/) Kenya.
